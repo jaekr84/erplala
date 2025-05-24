@@ -1,8 +1,9 @@
 import { prisma } from "lala/lib/db";
 import Link from "next/link";
+import { Proveedor } from "@prisma/client";
 
 export default async function ProveedoresPage() {
-  const proveedores = await prisma.proveedor.findMany({
+  const proveedores: Proveedor[] = await prisma.proveedor.findMany({
     orderBy: { nombre: "asc" },
   });
 
@@ -10,10 +11,20 @@ export default async function ProveedoresPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Listado de Proveedores</h1>
-        <Link href="/proveedores/nuevo">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded">+ Nuevo</button>
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/">
+            <button className="bg-gray-400 text-white px-4 py-2 rounded">
+              ← Home
+            </button>
+          </Link>
+          <Link href="/proveedores/nuevo">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded">
+              + Nuevo
+            </button>
+          </Link>
+        </div>
       </div>
+
       {proveedores.length === 0 ? (
         <p>No hay proveedores cargados.</p>
       ) : (

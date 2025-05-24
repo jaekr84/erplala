@@ -11,10 +11,20 @@ export default async function CategoriasPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-bold">Listado de Categorías</h1>
-        <Link href="/categorias/nuevo">
-          <button className="bg-green-600 text-white px-4 py-2 rounded">+ Nueva</button>
-        </Link>
+        <div className="flex gap-4">
+          <Link href="/">
+            <button className="bg-gray-400 text-white px-4 py-2 rounded">
+              ← Home
+            </button>
+          </Link>
+          <Link href="/categorias/nuevo">
+            <button className="bg-green-600 text-white px-4 py-2 rounded">
+              + Nueva
+            </button>
+          </Link>
+        </div>
       </div>
+
       {categorias.length === 0 ? (
         <p>No hay categorías cargadas.</p>
       ) : (

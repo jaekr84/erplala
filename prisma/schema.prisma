@@ -50,3 +50,9 @@ model Variante {
   codBarra   String   @unique
   producto   Producto @relation(fields: [productoId], references: [id])
 }
+model Contador {
+  id        Int     @id @default(autoincrement())
+  nombre    String  @unique
+  valor     Int
+  updatedAt DateTime @updatedAt
+}
