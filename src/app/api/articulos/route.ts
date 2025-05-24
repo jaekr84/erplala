@@ -1,52 +1,37 @@
-import { prisma } from "lala/lib/db";
-import { NextResponse } from "next/server";
+import { prisma } from 'lala/lib/db'
+import { NextResponse } from 'next/server'
 
-export async function POST(req: Request) {
-  try {
-    const data = await req.json();
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const query = searchParams.get('query')?.toLowerCase() || ''
+  const pagina = parseInt(searchParams.get('pagina') || '1', 10)
+  const porPagina = 25
+  const skip = (pagina - 1) * porPagina
 
-    const {
-      codigo,
-      fecha,
-      descripcion,
-      proveedorId,
-      categoriaId,
-      costo,
-      margen,
-      precioVenta,
-      variantes,
-    } = data;
+  const where: any = query
+    ? {
+        OR: [
+          { codigo: { contains: query, mode: 'insensitive' } },
+          { descripcion: { contains: query, mode: 'insensitive' } },
+        ],
+      }
+    : {}
 
-    if (!codigo || !descripcion || !proveedorId || !categoriaId) {
-      return NextResponse.json({ message: "Faltan campos obligatorios" }, { status: 400 });
-    }
-
-    const producto = await prisma.producto.create({
-      data: {
-        codigo: String(codigo),
-        descripcion,
-        costo,
-        precioVenta,
-        proveedorId: Number(proveedorId),
-        categoriaId: Number(categoriaId),
-        createdAt: new Date(fecha),
-        variantes: {
-          create: variantes.map((v: any) => ({
-            talle: v.talle,
-            color: v.color,
-            stock: v.stock ?? 0,
-            codBarra: v.codBarra,
-          })),
-        },
-      },
+  const [articulos, total] = await Promise.all([
+    prisma.producto.findMany({
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: porPagina,
       include: {
+        proveedor: { select: { nombre: true } },
         variantes: true,
       },
-    });
+    }),
+    prisma.producto.count({ where }),
+  ])
 
-    return NextResponse.json(producto);
-  } catch (error) {
-    console.error("Error al crear artículo:", error);
-    return NextResponse.json({ message: "Error interno" }, { status: 500 });
-  }
+  const totalPaginas = Math.ceil(total / porPagina)
+
+  return NextResponse.json({ articulos, totalPaginas })
 }
