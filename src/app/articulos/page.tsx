@@ -71,6 +71,7 @@ export default function ArticulosPage() {
               <th className="p-2 text-left">Descripción</th>
               <th className="p-2 text-left">Precio</th>
               <th className="p-2 text-left">Proveedor</th>
+              <th className="p-2"></th>
             </tr>
           </thead>
           <tbody>
@@ -84,6 +85,17 @@ export default function ArticulosPage() {
                 <td className="p-2">{a.descripcion}</td>
                 <td className="p-2">${a.precioVenta}</td>
                 <td className="p-2">{a.proveedor?.nombre || '—'}</td>
+                <td className="p-2">
+                  <Link href={`/articulos/editar/${a.id}`}>
+                    <button
+                      type="button"
+                      className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                      onClick={e => e.stopPropagation()} // Evita abrir el modal de detalle
+                    >
+                      Editar
+                    </button>
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -110,12 +122,15 @@ export default function ArticulosPage() {
 
       {detalle && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded max-w-2xl w-full relative">
+          <div className="bg-white p-6 rounded max-w-2xl w-full relative overflow-auto" style={{ maxHeight: '90vh' }}>
             <button
-              className="absolute top-2 right-2 text-sm text-gray-500"
+              className="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-700 focus:outline-none z-10"
               onClick={() => setDetalle(null)}
+              aria-label="Cerrar"
+              title="Cerrar"
+              style={{ background: 'black', borderRadius: '50%', width: 36, height: 36, lineHeight: '32px', textAlign: 'center', boxShadow: '0 1px 4px #0001' }}
             >
-              ✕
+              ×
             </button>
             <h2 className="text-xl font-bold mb-2">{detalle.descripcion}</h2>
             <p className="text-sm text-gray-600 mb-1">

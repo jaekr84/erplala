@@ -19,14 +19,20 @@ export default function PaginaContadores() {
       const resultados = await Promise.all(
         nombres.map(async (nombre) => {
           const res = await fetch(`/api/contador/proximo?nombre=${nombre}`)
-          if (!res.ok) throw new Error(`Error al cargar ${nombre}`)
+          // Corregido: Si no existe el contador, devolver valor 0 pero no lanzar error
+          if (!res.ok) {
+            console.warn(`No se pudo cargar el contador "${nombre}". Se usará valor 0.`)
+            return { nombre, valor: 0 }
+          }
           const data = await res.json()
-          return { nombre, valor: data.valor || 0 }
+          return { nombre, valor: data.valor ?? 0 }
         })
       )
       setContadores(resultados)
     } catch (error) {
       console.error("Error al cargar contadores:", error)
+      // Si ocurre un error general, inicializar todos en 0
+      setContadores(nombres.map((nombre) => ({ nombre, valor: 0 })))
     } finally {
       setLoading(false)
     }
@@ -76,7 +82,7 @@ export default function PaginaContadores() {
                 <input
                   type="number"
                   value={c.valor}
-                  onChange={(e) => handleChange(c.nombre, parseInt(e.target.value))}
+                  onChange={(e) => handleChange(c.nombre, parseInt(e.target.value) || 0)}
                   className="border p-1 w-24"
                 />
               </td>
@@ -92,11 +98,11 @@ export default function PaginaContadores() {
           ))}
         </tbody>
       </table>
-              <Link href="/">
-          <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-            ← Volver al inicio
-          </button>
-        </Link>
+      <Link href="/">
+        <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+          ← Volver al inicio
+        </button>
+      </Link>
     </div>
   )
 }

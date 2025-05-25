@@ -1,4 +1,3 @@
-// src/app/api/contador/incrementar/route.ts
 import { prisma } from "lala/lib/db";
 import { NextResponse } from "next/server";
 
@@ -9,9 +8,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Falta el nombre del contador" }, { status: 400 });
   }
 
-  const actualizado = await prisma.contador.update({
+  const actualizado = await prisma.contador.upsert({
     where: { nombre },
-    data: { valor: { increment: 1 } },
+    update: { valor: { increment: 1 } },
+    create: { nombre, valor: 1 },
   });
 
   return NextResponse.json({ valor: actualizado.valor });

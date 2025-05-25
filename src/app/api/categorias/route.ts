@@ -5,17 +5,37 @@ export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    // Validación mínima
-    if (!data.nombre || typeof data.nombre !== "string") {
+    // Limpiar y validar nombre
+    const nombreLimpio = typeof data.nombre === "string" ? data.nombre.trim() : "";
+
+    if (!nombreLimpio) {
       return NextResponse.json(
         { message: "El nombre de la categoría es obligatorio" },
         { status: 400 }
       );
     }
 
+    // Verificar duplicado insensible a mayúsculas
+    const existente = await prisma.categoria.findFirst({
+      where: {
+        nombre: {
+          equals: nombreLimpio,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    if (existente) {
+      return NextResponse.json(
+        { message: "La categoría ya existe" },
+        { status: 409 }
+      );
+    }
+
+    // Crear categoría
     const categoria = await prisma.categoria.create({
       data: {
-        nombre: data.nombre,
+        nombre: nombreLimpio,
       },
     });
 
@@ -28,6 +48,7 @@ export async function POST(req: Request) {
     );
   }
 }
+
 export async function GET() {
   const categorias = await prisma.categoria.findMany({
     select: {
@@ -35,7 +56,7 @@ export async function GET() {
       nombre: true,
     },
     orderBy: {
-      nombre: 'asc',
+      nombre: "asc",
     },
   });
 

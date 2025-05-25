@@ -1,4 +1,3 @@
-// src/app/api/contador/modificar/route.ts
 import { prisma } from "lala/lib/db";
 import { NextResponse } from "next/server";
 
@@ -9,9 +8,11 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ message: "Datos inválidos" }, { status: 400 });
   }
 
-  const actualizado = await prisma.contador.update({
+  // Usar upsert para crear o actualizar el contador
+  const actualizado = await prisma.contador.upsert({
     where: { nombre },
-    data: { valor },
+    update: { valor },
+    create: { nombre, valor },
   });
 
   return NextResponse.json({ valor: actualizado.valor });
