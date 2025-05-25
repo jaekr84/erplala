@@ -34,6 +34,16 @@ export default function HomePage() {
             Nuevo Artículo
           </button>
         </Link>
+        <Link href="/compras/nueva">
+          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+            Nueva Compra
+          </button>
+        </Link>
+        <Link href="/compras">
+          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+            Lista de Compras
+          </button>
+        </Link>
       </div>
     </div>
   );

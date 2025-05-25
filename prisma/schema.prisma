@@ -32,7 +32,7 @@ model Producto {
   codigo      String     @unique
   descripcion String
   costo       Float
-  margen      Float      // 👈 agregado aquí en el modelo
+  margen      Float // 👈 agregado aquí en el modelo
   precioVenta Float
   proveedorId Int
   categoriaId Int
@@ -95,23 +95,21 @@ model MovimientoStock {
 
 model Compra {
   id          Int             @id @default(autoincrement())
-  numero      String          @unique // COMP000001
+  proveedor   Proveedor       @relation(fields: [proveedorId], references: [id])
   proveedorId Int
   fecha       DateTime        @default(now())
   total       Float
   detalles    DetalleCompra[]
-  proveedor   Proveedor       @relation(fields: [proveedorId], references: [id])
   createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model DetalleCompra {
-  id            Int   @id @default(autoincrement())
-  compraId      Int
-  varianteId    Int
-  cantidad      Int
-  costoUnitario Float
-  subtotal      Float
-
-  compra   Compra   @relation(fields: [compraId], references: [id])
-  variante Variante @relation(fields: [varianteId], references: [id])
+  id         Int      @id @default(autoincrement())
+  compra     Compra   @relation(fields: [compraId], references: [id])
+  compraId   Int
+  variante   Variante @relation(fields: [varianteId], references: [id])
+  varianteId Int
+  cantidad   Int
+  costo      Float
 }

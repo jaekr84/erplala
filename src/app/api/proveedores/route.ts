@@ -32,8 +32,19 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url)
+  const query = searchParams.get('query')
+
   const proveedores = await prisma.proveedor.findMany({
+    where: query
+      ? {
+          nombre: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        }
+      : undefined,
     select: {
       id: true,
       nombre: true,
@@ -41,7 +52,7 @@ export async function GET() {
     orderBy: {
       nombre: 'asc',
     },
-  });
+  })
 
-  return NextResponse.json(proveedores);
+  return NextResponse.json(proveedores)
 }
