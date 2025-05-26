@@ -2,7 +2,7 @@
 import { formatCurrency } from '@/utils/format'
 
 type CompraConDetalles = {
-  nroComprobante: true
+  nroComprobante: string
   id: number
   fecha: string
   proveedor: { nombre: string }

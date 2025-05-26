@@ -1,37 +1,10 @@
 'use client'
-import { useEffect, useState } from "react"
-import Link from "next/link"
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import ModalDetalleCompra from '@/components/ModalDetalleCompra'
+import { CompraConDetalles } from '@/types'
 
-// Tipos
-type Variante = {
-  codBarra: string
-  producto: {
-    descripcion: string
-  }
-  talle: string
-  color: string
-}
-
-type DetalleCompra = {
-  id: number
-  variante: Variante
-  cantidad: number
-  costo: number
-}
-
-type Compra = {
-  id: number
-  fecha: string
-  proveedor: {
-    nombre: string
-  }
-  total: number
-  detalles: DetalleCompra[]
-  nroComprobante: string
-}
-
-// Formato de moneda
+// Formateador de moneda
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -40,9 +13,9 @@ const formatCurrency = (value: number) =>
   }).format(value)
 
 export default function ComprasPage() {
-  const [compras, setCompras] = useState<Compra[]>([])
+  const [compras, setCompras] = useState<CompraConDetalles[]>([])
   const [error, setError] = useState<string | null>(null)
-  const [compraSeleccionada, setCompraSeleccionada] = useState<Compra | null>(null)
+  const [compraSeleccionada, setCompraSeleccionada] = useState<CompraConDetalles | null>(null)
   const [busqueda, setBusqueda] = useState('')
 
   useEffect(() => {
@@ -53,7 +26,7 @@ export default function ComprasPage() {
       })
       .then(data => {
         if (busqueda.trim()) {
-          const filtradas = data.filter((c: Compra) =>
+          const filtradas = data.filter((c: CompraConDetalles) =>
             c.nroComprobante.toLowerCase().includes(busqueda.trim().toLowerCase())
           )
           setCompras(filtradas)
@@ -70,7 +43,6 @@ export default function ComprasPage() {
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {/* Controles */}
       <div className="flex justify-between items-center mb-4">
         <input
           type="text"
@@ -94,8 +66,8 @@ export default function ComprasPage() {
       </div>
 
       <table className="w-full border text-sm">
-        <thead>
-          <tr className="bg-gray-100">
+        <thead className="bg-gray-100">
+          <tr>
             <th className="p-2 text-left">Comprobante</th>
             <th className="p-2 text-left">Fecha</th>
             <th className="p-2 text-left">Proveedor</th>
