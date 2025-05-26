@@ -29,11 +29,25 @@ export default function ArticulosPage() {
 
   useEffect(() => {
     const fetchArticulos = async () => {
-      const res = await fetch(`/api/articulos?query=${busqueda}&pagina=${pagina}`)
-      const data = await res.json()
-      setArticulos(data.articulos)
-      setTotalPaginas(data.totalPaginas)
+      try {
+        const res = await fetch(`/api/articulos?query=${encodeURIComponent(busqueda)}&pagina=${pagina}`)
+
+        if (!res.ok) {
+          const errorText = await res.text()
+          console.error(`❌ Error al cargar artículos:`, errorText)
+          throw new Error('No se pudo cargar la lista de artículos.')
+        }
+
+        const data = await res.json()
+        setArticulos(data.articulos)
+        setTotalPaginas(data.totalPaginas)
+      } catch (error) {
+        console.error('🚨 Error en fetchArticulos:', error)
+        setArticulos([]) // opcional: limpiar resultados en caso de error
+        setTotalPaginas(1)
+      }
     }
+
     fetchArticulos()
   }, [busqueda, pagina])
 
@@ -41,11 +55,18 @@ export default function ArticulosPage() {
     <div className="p-6 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Listado de Artículos</h1>
-        <Link href="/">
-          <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-            ← Volver al inicio
-          </button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/articulos/nuevo">
+            <button className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+              + Nuevo artículo
+            </button>
+          </Link>
+          <Link href="/">
+            <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+              ← Volver al inicio
+            </button>
+          </Link>
+        </div>
       </div>
 
       <div className="mb-4 flex gap-4 items-center">

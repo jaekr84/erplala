@@ -31,7 +31,7 @@ export default function NuevaCompraPage() {
   const [modalCrearArticulo, setModalCrearArticulo] = useState(false)
 
   useEffect(() => {
-    setFecha(new Date().toISOString())
+    setFecha(new Date().toISOString().split('T')[0]) // Formato YYYY-MM-DD
 
     fetch('/api/contador/proximo?nombre=compra')
       .then(async res => {
@@ -96,6 +96,7 @@ export default function NuevaCompraPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        nroComprobante, // 🔹 ahora se incluye aquí
         proveedorId: proveedor.id,
         descuento,
         variantes: variantesCompra.map(v => ({
@@ -343,6 +344,11 @@ export default function NuevaCompraPage() {
       >
         Confirmar compra
       </button>
+      <Link href="/">
+        <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+          ← Volver al inicio
+        </button>
+      </Link>
       {modalCrearArticulo && (
         <ModalCrearArticulo
           onClose={() => setModalCrearArticulo(false)}

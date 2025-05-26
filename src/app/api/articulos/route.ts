@@ -1,48 +1,65 @@
-import { prisma } from 'lala/lib/db'
 import { NextResponse } from 'next/server'
+import { prisma } from 'lala/lib/db'
 
-// Listar artículos
+// ✅ GET: Listar artículos con búsqueda y paginación
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
-  const query = searchParams.get('query')?.toLowerCase() || ''
+  const query = searchParams.get('query') || ''
   const pagina = parseInt(searchParams.get('pagina') || '1', 10)
-  const porPagina = 25
+  const porPagina = 10
   const skip = (pagina - 1) * porPagina
 
-  const where: any = query
-    ? {
-        OR: [
-          { codigo: { contains: query, mode: 'insensitive' } },
-          { descripcion: { contains: query, mode: 'insensitive' } },
-        ],
-      }
-    : {}
+  try {
+    const [articulos, total] = await Promise.all([
+      prisma.producto.findMany({
+        where: {
+          OR: [
+            { descripcion: { contains: query, mode: 'insensitive' } },
+            { codigo: { contains: query, mode: 'insensitive' } },
+          ]
+        },
+        include: {
+          proveedor: { select: { nombre: true } },
+          categoria: { select: { nombre: true } },
+          variantes: {
+            select: {
+              id: true,
+              talle: true,
+              color: true,
+              stock: true,
+              codBarra: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: porPagina,
+        skip
+      }),
+      prisma.producto.count({
+        where: {
+          OR: [
+            { descripcion: { contains: query, mode: 'insensitive' } },
+            { codigo: { contains: query, mode: 'insensitive' } },
+          ]
+        }
+      })
+    ])
 
-  const [articulos, total] = await Promise.all([
-    prisma.producto.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: porPagina,
-      include: {
-        proveedor: { select: { nombre: true } },
-        variantes: true,
-      },
-    }),
-    prisma.producto.count({ where }),
-  ])
+    const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
 
-  const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
-
-  return NextResponse.json({ articulos, totalPaginas })
+    return NextResponse.json({ articulos, totalPaginas })
+  } catch (error) {
+    console.error('❌ Error en GET /api/articulos:', error)
+    return NextResponse.json({ message: 'Error interno del servidor' }, { status: 500 })
+  }
 }
 
-// Crear artículo
+// ✅ POST: Crear nuevo artículo
 export async function POST(req: Request) {
   const data = await req.json()
 
   if (
-    !data.codigo ||
+    !data.codigo || // ← ahora validamos también que venga el código generado desde el form
     !data.descripcion ||
     typeof data.costo !== 'number' ||
     typeof data.margen !== 'number' ||
@@ -63,7 +80,7 @@ export async function POST(req: Request) {
         precioVenta: data.precioVenta,
         proveedorId: Number(data.proveedorId),
         categoriaId: Number(data.categoriaId),
-        variantes: data.variantes && Array.isArray(data.variantes)
+        variantes: Array.isArray(data.variantes) && data.variantes.length > 0
           ? {
               create: data.variantes.map((v: any) => ({
                 talle: v.talle,
@@ -75,9 +92,10 @@ export async function POST(req: Request) {
           : undefined
       }
     })
+
     return NextResponse.json(producto)
   } catch (error) {
-    console.error(error)
+    console.error('❌ Error al crear producto:', error)
     return NextResponse.json({ message: 'Error al crear producto' }, { status: 500 })
   }
 }

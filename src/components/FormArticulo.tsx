@@ -77,45 +77,48 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (variantes.length === 0) {
-      setErrorVariantes('Debe generar al menos una variante antes de guardar el artículo.')
-      return
-    }
-
-    setErrorVariantes('')
-
-    await fetch('/api/contador/incrementar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre: 'articulo' }),
-    })
-
-    await fetch('/api/articulos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        codigo,
-        fecha,
-        descripcion,
-        proveedorId,
-        categoriaId,
-        costo,
-        margen,
-        precioVenta,
-        variantes,
-      }),
-    })
-
-    onArticuloCreado?.()
-    if (modo === 'modal') {
-      onClose?.()
-    } else {
-      router.push('/articulos')
-    }
+  if (variantes.length === 0) {
+    setErrorVariantes('Debe generar al menos una variante antes de guardar el artículo.')
+    return
   }
 
+  setErrorVariantes('')
+
+  // ✅ Solo una vez: incrementar contador y obtener el valor real
+  const resContador = await fetch('/api/contador/incrementar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nombre: 'articulo' }),
+  })
+  const { valor } = await resContador.json()
+  const codigoFinal = valor.toString()
+
+  // ✅ Crear artículo con el código que acabás de generar
+  await fetch('/api/articulos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      codigo: codigoFinal, // <-- clave corregida
+      fecha,
+      descripcion,
+      proveedorId,
+      categoriaId,
+      costo,
+      margen,
+      precioVenta,
+      variantes,
+    }),
+  })
+
+  onArticuloCreado?.()
+  if (modo === 'modal') {
+    onClose?.()
+  } else {
+    router.push('/articulos')
+  }
+}
   const actualizarVariante = (index: number, campo: keyof typeof variantes[0], valor: string | number) => {
     setVariantes(prev => {
       const copia = [...prev]

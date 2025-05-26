@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "resetdb": "tsx scripts/reset.ts"
   },
   "dependencies": {
     "-": "^0.0.1",
@@ -29,6 +30,7 @@
     "postcss": "^8",
     "prisma": "^6.8.2",
     "tailwindcss": "^3.4.1",
+    "tsx": "^4.19.4",
     "typescript": "^5"
   }
 }

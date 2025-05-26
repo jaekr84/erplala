@@ -1,23 +1,32 @@
 // src/components/ModalDetalleCompra.tsx
 import { formatCurrency } from '@/utils/format'
 
-export default function ModalDetalleCompra({ compra, onClose }: {
-  compra: {
+type CompraConDetalles = {
+  nroComprobante: true
+  id: number
+  fecha: string
+  proveedor: { nombre: string }
+  total: number
+  detalles: {
     id: number
-    fecha: string
-    proveedor: { nombre: string }
-    total: number
-    detalles: {
-      id: number
-      cantidad: number
-      costo: number
-      variante: {
-        talle: string
-        color: string
-        producto: { descripcion: string, codigo: string }
+    cantidad: number
+    costo: number
+    variante: {
+      talle: string
+      color: string
+      producto: {
+        descripcion: string
+        codigo: string
       }
-    }[]
-  }
+    }
+  }[]
+}
+
+export default function ModalDetalleCompra({
+  compra,
+  onClose,
+}: {
+  compra: CompraConDetalles
   onClose: () => void
 }) {
   return (
@@ -28,7 +37,9 @@ export default function ModalDetalleCompra({ compra, onClose }: {
           className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-xl"
         >×</button>
 
-        <h2 className="text-xl font-bold mb-2">Detalle de Compra #{compra.id}</h2>
+        <h2 className="text-xl font-bold mb-2">
+          Detalle de Compra {compra.nroComprobante}
+        </h2>
         <p className="text-sm text-gray-600 mb-4">
           Fecha: {new Date(compra.fecha).toLocaleDateString()}<br />
           Proveedor: {compra.proveedor.nombre}<br />

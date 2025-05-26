@@ -1,18 +1,37 @@
-import { prisma } from "lala/lib/db";
-import { NextResponse } from "next/server";
+import { prisma } from "lala/lib/db"
+import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
-  const { nombre } = await req.json();
+  const { nombre } = await req.json()
 
   if (!nombre) {
-    return NextResponse.json({ message: "Falta el nombre del contador" }, { status: 400 });
+    return NextResponse.json({ message: "Falta el nombre del contador" }, { status: 400 })
   }
 
-  const actualizado = await prisma.contador.upsert({
-    where: { nombre },
-    update: { valor: { increment: 1 } },
-    create: { nombre, valor: 1 },
-  });
+  try {
+    const contador = await prisma.contador.findUnique({
+      where: { nombre }
+    })
 
-  return NextResponse.json({ valor: actualizado.valor });
+    let nuevoValor: number
+
+    if (!contador) {
+      const creado = await prisma.contador.create({
+        data: { nombre, valor: 1 }
+      })
+      nuevoValor = creado.valor
+    } else {
+      const actualizado = await prisma.contador.update({
+        where: { nombre },
+        data: { valor: { increment: 1 } },
+        select: { valor: true }
+      })
+      nuevoValor = actualizado.valor
+    }
+
+    return NextResponse.json({ valor: nuevoValor })
+  } catch (error) {
+    console.error("❌ Error en incrementar contador:", error)
+    return NextResponse.json({ message: "Error interno" }, { status: 500 })
+  }
 }

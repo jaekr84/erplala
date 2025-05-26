@@ -15,28 +15,27 @@ export default function PaginaContadores() {
   const nombres = ['articulo', 'venta', 'compra']
 
   const fetchContadores = async () => {
-    try {
-      const resultados = await Promise.all(
-        nombres.map(async (nombre) => {
-          const res = await fetch(`/api/contador/proximo?nombre=${nombre}`)
-          // Corregido: Si no existe el contador, devolver valor 0 pero no lanzar error
-          if (!res.ok) {
-            console.warn(`No se pudo cargar el contador "${nombre}". Se usará valor 0.`)
-            return { nombre, valor: 0 }
-          }
-          const data = await res.json()
-          return { nombre, valor: data.valor ?? 0 }
-        })
-      )
-      setContadores(resultados)
-    } catch (error) {
-      console.error("Error al cargar contadores:", error)
-      // Si ocurre un error general, inicializar todos en 0
-      setContadores(nombres.map((nombre) => ({ nombre, valor: 0 })))
-    } finally {
-      setLoading(false)
-    }
+  try {
+    const resultados = await Promise.all(
+      nombres.map(async (nombre) => {
+        const res = await fetch(`/api/contador/proximo?nombre=${nombre}`)
+        if (!res.ok) {
+          console.warn(`No se pudo cargar el contador "${nombre}". Se usará valor 0.`)
+          return { nombre, valor: 0 }
+        }
+        const data = await res.json()
+        const valor = typeof data.valor === 'number' ? data.valor : parseInt(data.valor) || 0
+        return { nombre, valor }
+      })
+    )
+    setContadores(resultados)
+  } catch (error) {
+    console.error("Error al cargar contadores:", error)
+    setContadores(nombres.map((nombre) => ({ nombre, valor: 0 })))
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleChange = (nombre: string, valor: number) => {
     setContadores((prev) =>

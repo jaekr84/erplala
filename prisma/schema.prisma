@@ -52,7 +52,7 @@ model Variante {
   codBarra    String            @unique
   producto    Producto          @relation(fields: [productoId], references: [id])
   detalles    DetalleCompra[]
-  movimientos MovimientoStock[] @relation("VarianteMovimientos")
+  movimientos MovimientoStock[]
   Stock       Stock?
 }
 
@@ -79,29 +79,31 @@ enum TipoMovimiento {
   EGRESO
   AJUSTE
   CAMBIO
+  COMPRA
 }
 
 model MovimientoStock {
+  usuarioId   Int? // para registrar quién hizo el movimiento, si agregás usuarios
   id          Int            @id @default(autoincrement())
   varianteId  Int
-  fecha       DateTime       @default(now())
   tipo        TipoMovimiento
   cantidad    Int
   comprobante String
   observacion String?
-
-  variante Variante @relation(fields: [varianteId], references: [id], name: "VarianteMovimientos")
+  fecha       DateTime       @default(now())
+  variante    Variante       @relation(fields: [varianteId], references: [id])
 }
 
 model Compra {
-  id          Int             @id @default(autoincrement())
-  proveedor   Proveedor       @relation(fields: [proveedorId], references: [id])
-  proveedorId Int
-  fecha       DateTime        @default(now())
-  total       Float
-  detalles    DetalleCompra[]
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id             Int             @id @default(autoincrement())
+  nroComprobante String          @unique @default("TEMP")
+  proveedor      Proveedor       @relation(fields: [proveedorId], references: [id])
+  proveedorId    Int
+  fecha          DateTime        @default(now())
+  total          Float
+  detalles       DetalleCompra[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model DetalleCompra {
@@ -112,4 +114,5 @@ model DetalleCompra {
   varianteId Int
   cantidad   Int
   costo      Float
+  subtotal   Float    @default(0) // calculado como cantidad * costo si querés simplificar análisis
 }

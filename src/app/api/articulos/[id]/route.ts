@@ -8,6 +8,11 @@ type Params = {
 export async function GET(_req: Request, { params }: Params) {
   const id = Number(params.id)
 
+  // Validar que el id sea un número válido
+  if (isNaN(id)) {
+    return NextResponse.json({ message: "ID inválido" }, { status: 400 })
+  }
+
   const articulo = await prisma.producto.findUnique({
     where: { id },
     include: {
@@ -93,40 +98,5 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   } catch (error) {
     console.error("Error al actualizar artículo:", error)
     return NextResponse.json({ message: "Error al actualizar" }, { status: 500 })
-  }
-}
-
-export async function POST(req: Request) {
-  const data = await req.json()
-
-  if (
-    !data.codigo ||
-    !data.descripcion ||
-    typeof data.costo !== 'number' ||
-    typeof data.margen !== 'number' ||
-    typeof data.precioVenta !== 'number' ||
-    !data.proveedorId ||
-    !data.categoriaId
-  ) {
-    return NextResponse.json({ message: 'Datos incompletos' }, { status: 400 })
-  }
-
-  try {
-    const producto = await prisma.producto.create({
-      data: {
-        codigo: String(data.codigo), // 👈 fuerza a string
-        descripcion: data.descripcion,
-        costo: data.costo,
-        margen: data.margen,
-        precioVenta: data.precioVenta,
-        proveedorId: Number(data.proveedorId),
-        categoriaId: Number(data.categoriaId),
-        // variantes: { create: [...] }
-      }
-    })
-    return NextResponse.json(producto)
-  } catch (error) {
-    console.error(error)
-    return NextResponse.json({ message: 'Error al crear producto' }, { status: 500 })
   }
 }

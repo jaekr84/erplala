@@ -10,6 +10,7 @@ export type Variante = {
   color: string;
   stock: number;
   costo?: number;
+  codigo: string;
 };
 
 export type Articulo = {

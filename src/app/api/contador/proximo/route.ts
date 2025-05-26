@@ -9,11 +9,17 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Falta el parámetro 'nombre'" }, { status: 400 });
   }
 
-  const contador = await prisma.contador.findUnique({ where: { nombre } });
+  // Buscar el contador sin incrementarlo
+  const contador = await prisma.contador.findUnique({
+    where: { nombre }
+  });
 
-  if (!contador) {
-    return NextResponse.json({ message: "Contador no encontrado" }, { status: 404 });
-  }
+  const valorActual = contador?.valor ?? 0;
+  const proximoValor = valorActual + 1;
 
-  return NextResponse.json({ valor: contador.valor });
+  // Devuelve formateado, por ejemplo: C0000012
+  const prefijo = nombre.charAt(0).toUpperCase();
+  const numeroFormateado = `${prefijo}${String(proximoValor).padStart(7, "0")}`;
+
+  return NextResponse.json({ valor: proximoValor, formateado: numeroFormateado });
 }
