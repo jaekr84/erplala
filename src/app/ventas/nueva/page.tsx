@@ -295,7 +295,6 @@ export default function NuevaVentaPage() {
                     Cancelar
                 </button>
                 <div className="flex gap-2">
-                    <button className="px-4 py-2 bg-yellow-500 text-white rounded" onClick={() => alert('Ticket de cambio')}>Ticket de cambio</button>
                     <button onClick={confirmarVenta} className="px-6 py-2 bg-green-600 text-white rounded">
                         Generar venta
                     </button>
