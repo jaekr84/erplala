@@ -99,6 +99,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/etiquetas" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <BarChart2 size={18} /> Etiquetas
               </Link>
+              {/* Datos del negocio */}
+              <Link href="/datosNegocio" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <BarChart2 size={18} /> Datos del negocio
+              </Link>
             </nav>
           </aside>
 

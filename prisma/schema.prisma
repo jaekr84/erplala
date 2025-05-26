@@ -161,3 +161,12 @@ model VentaMedioPago {
   medioPagoId Int
   monto       Float
 }
+
+model DatosNegocio {
+  id        Int    @id @default(1)
+  nombre    String
+  direccion String
+  telefono  String
+  cuit      String
+  pieTicket String
+}
