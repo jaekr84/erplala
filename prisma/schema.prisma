@@ -9,7 +9,7 @@ datasource db {
 
 model Proveedor {
   id        Int        @id @default(autoincrement())
-  nombre    String
+  nombre    String     @unique
   telefono  String?
   email     String?
   direccion String?
@@ -21,7 +21,7 @@ model Proveedor {
 
 model Categoria {
   id        Int        @id @default(autoincrement())
-  nombre    String
+  nombre    String     @unique
   productos Producto[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt

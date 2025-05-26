@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-gray-50 text-gray-800">
         <div className="flex h-screen overflow-hidden">
           {/* Sidebar */}
-          <aside className="w-64 bg-white border-r p-6 shadow-md flex flex-col">
+          <aside className="w-64 bg-white border-r p-6 shadow-md flex flex-col overflow-y-auto">
             <h1 className="text-xl font-bold text-blue-600 mb-6">ERP Lalá</h1>
 
             {/* Botón Home */}
@@ -71,6 +71,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <Link href="/ventas" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <List size={18} /> Lista de Ventas
+              </Link>
+              <Link href="/importar" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <List size={18} /> Importación
+              </Link>
+              <Link href="/medios-pago" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <List size={18} /> Medios de Pago
+              </Link>
+              <Link href="/ajuste-stock" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <List size={18} /> Ajuste de Stock
               </Link>
             </nav>
           </aside>
