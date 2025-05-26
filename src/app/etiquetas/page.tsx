@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Variante, Producto } from '@prisma/client'
@@ -16,6 +17,17 @@ export default function EtiquetasPage() {
   const [variantesEncontradas, setVariantesEncontradas] = useState<VarianteEtiqueta[]>([])
   const [seleccionadas, setSeleccionadas] = useState<VarianteEtiqueta[]>([])
   const [mensaje, setMensaje] = useState<string | null>(null)
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const compraId = searchParams.get('compraId')
+    if (compraId) {
+      fetch(`/api/etiquetas/compra?compraId=${compraId}`)
+        .then(res => res.json())
+        .then(setSeleccionadas)
+        .catch(() => setMensaje('❌ Error al cargar etiquetas de la compra'))
+    }
+  }, [searchParams])
 
   const buscar = async () => {
     if (!busqueda.trim()) return
@@ -51,10 +63,12 @@ export default function EtiquetasPage() {
       const url = URL.createObjectURL(blob)
       window.open(url, '_blank')
       setMensaje('✅ PDF generado correctamente')
+      setSeleccionadas([])
+      setVariantesEncontradas([])
+      setBusqueda('')
     } else {
       setMensaje('❌ Error al generar el PDF')
     }
-    
   }
 
   return (
