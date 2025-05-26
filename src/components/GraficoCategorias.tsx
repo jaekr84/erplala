@@ -5,7 +5,7 @@ import ModalArticulosCategoria from './ModalArticulosCategoria'
 export default function GraficoCategorias() {
   const [data, setData] = useState([])
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string | null>(null)
-  const alturaPorCategoria = 80 // px por fila
+  const alturaPorCategoria = 80
   const height = data.length * alturaPorCategoria
 
   useEffect(() => {
@@ -14,11 +14,13 @@ export default function GraficoCategorias() {
       .then(setData)
   }, [])
 
+  const formatCantidad = (value: number) => value.toLocaleString('es-AR')
+
   return (
     <div className="bg-white p-4 rounded-xl shadow-lg w-full h-auto">
       <h2 className="text-xl font-bold text-gray-800 mb-6 border-b pb-2">📊 Ventas por Categoría</h2>
 
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={height}>
         <BarChart
           data={data}
           layout="vertical"
@@ -27,11 +29,16 @@ export default function GraficoCategorias() {
         >
           <XAxis type="number" hide />
           <YAxis dataKey="nombre" type="category" width={1} />
-          <Bar dataKey="cantidad" barSize={30}  onClick={(data: any) => setCategoriaSeleccionada(data.nombre)}>
+          <Bar
+            dataKey="cantidad"
+            barSize={30}
+            onClick={(data: any) => setCategoriaSeleccionada(data.nombre)}
+            isAnimationActive={false}
+          >
             <LabelList
               dataKey="cantidad"
               position="insideRight"
-              formatter={(value: number) => value.toLocaleString('es-AR')}
+              formatter={formatCantidad}
               fill="white"
               style={{ fontWeight: 600 }}
             />
