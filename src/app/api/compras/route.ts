@@ -60,9 +60,10 @@ export async function POST(req: Request) {
         await tx.movimientoStock.create({
           data: {
             varianteId: Number(v.id),
-            tipo: "COMPRA", // si agregaste este tipo a tu enum
+            tipo: "COMPRA",
             cantidad: Number(v.cantidad),
-            comprobante: nroComprobante, // ✅ correcto ahora
+            comprobante: nroComprobante,
+            costo: Number(v.costo), // ✅ agregado para registrar en el Kardex
             observacion: "Compra",
           },
         });
@@ -92,13 +93,13 @@ export async function GET() {
               producto: {
                 select: {
                   descripcion: true,
-                  codigo: true, 
-                }
-              }
-            }
-          }
-        }
-      }
+                  codigo: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       fecha: "desc",

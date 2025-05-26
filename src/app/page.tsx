@@ -2,48 +2,94 @@ import Link from "next/link";
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-8">Bienvenido al ERP Lalá</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 py-12">
+      <div className="max-w-4xl w-full text-center">
+        <h1 className="text-3xl font-semibold text-gray-800 mb-10 tracking-tight">
+          Bienvenido al ERP <span className="text-blue-600">Lalá</span>
+        </h1>
 
-      <div className="flex gap-6">
-        <Link href="/proveedores">
-          <button className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <Link
+            href="/proveedores"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Proveedores
-          </button>
-        </Link>
+          </Link>
 
-        <Link href="/categorias">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          <Link
+            href="/categorias"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Categorías
-          </button>
-        </Link>
+          </Link>
 
-        <Link href="/contadores">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          <Link
+            href="/contadores"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Contadores
-          </button>
-        </Link>
+          </Link>
 
-        <Link href="/articulos">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          <Link
+            href="/articulos"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Lista de Artículos
-          </button>
-        </Link>
-        <Link href="/articulos/nuevo">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          </Link>
+
+          <Link
+            href="/articulos/nuevo"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Nuevo Artículo
-          </button>
-        </Link>
-        <Link href="/compras/nueva">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          </Link>
+
+          <Link
+            href="/compras/nueva"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Nueva Compra
-          </button>
-        </Link>
-        <Link href="/compras">
-          <button className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700 transition">
+          </Link>
+
+          <Link
+            href="/compras"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
             Lista de Compras
-          </button>
-        </Link>
+          </Link>
+
+          <Link
+            href="/clientes"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
+            Lista de Clientes
+          </Link>
+
+          <Link
+            href="/clientes/nuevo"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
+            Nuevo Cliente
+          </Link>
+          <Link
+            href="/medios-pago"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
+            Medios de Pago
+          </Link>
+          <Link
+            href="/ventas/nueva"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
+            Nueva Venta
+          </Link>
+          <Link
+            href="/ventas"
+            className="block w-full bg-white shadow-sm rounded-xl border border-gray-200 hover:shadow-md transition p-4 text-gray-700 text-sm font-medium text-center"
+          >
+            Ventas
+          </Link>
+        </div>
       </div>
     </div>
   );

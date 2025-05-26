@@ -1,5 +1,17 @@
 // types.ts
 
+export type Cliente = {
+  id: number
+  nombre: string
+  apellido: string
+  dni?: string
+  telefono?: string
+  email?: string
+  fechaNac?: string
+  createdAt: string
+  updatedAt: string
+}
+
 export type Proveedor = {
   id: number;
   nombre: string;
@@ -29,7 +41,6 @@ export type VarianteCompra = Variante & {
   costo: number;
 };
 
-// Tipo compartido: Detalle de variante de producto para compras/ventas completas
 export type VarianteDetallada = {
   talle: string;
   color: string;
@@ -39,7 +50,6 @@ export type VarianteDetallada = {
   };
 };
 
-// Detalle de una línea de compra o venta
 export type DetalleMovimiento = {
   id: number;
   cantidad: number;
@@ -47,7 +57,6 @@ export type DetalleMovimiento = {
   variante: VarianteDetallada;
 };
 
-// Compra con proveedor, detalles y comprobante
 export type CompraConDetalles = {
   id: number;
   nroComprobante: string;
@@ -59,19 +68,7 @@ export type CompraConDetalles = {
   detalles: DetalleMovimiento[];
 };
 
-// (Opcional) Venta con cliente, detalles y comprobante
-export type VentaConDetalles = {
-  id: number;
-  nroComprobante: string;
-  fecha: string;
-  cliente?: {
-    nombre: string;
-  };
-  total: number;
-  detalles: DetalleMovimiento[];
-};
 
-// Artículo completo con variantes para edición o visualización detallada
 export type ArticuloCompleto = {
   id: number;
   codigo: string;
@@ -84,21 +81,44 @@ export type ArticuloCompleto = {
   createdAt: string;
   variantes: Variante[];
 };
-export type NuevaCompraPayload = {
-  proveedorId: number
-  descuento?: number
-  variantes: {
+
+export type VarianteConProducto = {
+  id: number;
+  codBarra: string;
+  talle: string;
+  color: string;
+  stock: number;
+  producto: {
+    codigo: string;
+    descripcion: string;
+    precioVenta: number;
+  };
+}
+
+export type MedioPago = {
+  id: number;
+  nombre: string;
+};
+
+export type VentaConDetalles = {
+  id: number
+  nroComprobante: string
+  fecha: string
+  total: number
+  cliente: {
+    nombre: string
+  } | null
+  detalles: {
     id: number
     cantidad: number
-    costo: number
+    precio: number // ← este campo es el que falta
+    variante: {
+      talle: string
+      color: string
+      producto: {
+        codigo: string
+        descripcion: string
+      }
+    }
   }[]
-}
-export type NuevoArticuloPayload = {
-  descripcion: string
-  costo: number
-  margen: number
-  proveedorId: number
-  categoriaId: number
-  talles: string[]
-  colores: string[]
 }
