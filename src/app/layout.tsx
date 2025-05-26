@@ -11,8 +11,11 @@ import {
   ShoppingCart,
   Users,
   UserPlus,
-  ReceiptIcon,
-  List,
+  Receipt,
+  Wrench,
+  Upload,
+  CreditCard,
+  BarChart2,
 } from 'lucide-react'
 
 export const metadata = {
@@ -39,6 +42,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             {/* Menú de navegación */}
             <nav className="flex flex-col gap-2 text-sm">
+              {/* Ventas */}
+              <Link href="/ventas/nueva" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <Receipt size={18} /> Nueva Venta
+              </Link>
+              <Link href="/ventas" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <ListOrdered size={18} /> Lista de Ventas
+              </Link>
+
+              {/* Compras */}
+              <Link href="/compras/nueva" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <ShoppingCart size={18} /> Nueva Compra
+              </Link>
+              <Link href="/compras" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <ListOrdered size={18} /> Lista de Compras
+              </Link>
+
+              {/* Artículos y stock */}
+              <Link href="/articulos" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <Package size={18} /> Lista de Artículos
+              </Link>
+              <Link href="/articulos/nuevo" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <Plus size={18} /> Nuevo Artículo
+              </Link>
+              <Link href="/ajuste-stock" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <Wrench size={18} /> Ajuste de Stock
+              </Link>
+              <Link href="/importar" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <Upload size={18} /> Importación
+              </Link>
+
+              {/* Configuración */}
               <Link href="/proveedores" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <Truck size={18} /> Proveedores
               </Link>
@@ -48,38 +82,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/contadores" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <Settings size={18} /> Contadores
               </Link>
-              <Link href="/articulos" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <Package size={18} /> Lista de Artículos
+              <Link href="/medios-pago" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <CreditCard size={18} /> Medios de Pago
               </Link>
-              <Link href="/articulos/nuevo" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <Plus size={18} /> Nuevo Artículo
-              </Link>
-              <Link href="/compras/nueva" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <ShoppingCart size={18} /> Nueva Compra
-              </Link>
-              <Link href="/compras" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <ListOrdered size={18} /> Lista de Compras
-              </Link>
+
+              {/* Clientes */}
               <Link href="/clientes" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <Users size={18} /> Lista de Clientes
               </Link>
               <Link href="/clientes/nuevo" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <UserPlus size={18} /> Nuevo Cliente
               </Link>
-              <Link href="/ventas/nueva" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <ReceiptIcon size={18} /> Nueva Venta
-              </Link>
-              <Link href="/ventas" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <List size={18} /> Lista de Ventas
-              </Link>
-              <Link href="/importar" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <List size={18} /> Importación
-              </Link>
-              <Link href="/medios-pago" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <List size={18} /> Medios de Pago
-              </Link>
-              <Link href="/ajuste-stock" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <List size={18} /> Ajuste de Stock
+
+              {/* Dashboard */}
+              <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <BarChart2 size={18} /> Dashboard
               </Link>
             </nav>
           </aside>
