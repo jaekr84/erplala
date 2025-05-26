@@ -136,152 +136,186 @@ export default function EditarArticuloPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-xl font-bold mb-2">Editar Artículo <span className="text-gray-500">({codigo})</span></h1>
+  <div className="p-8 max-w-5xl mx-auto">
+    <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+      Editar Artículo <span className="text-gray-500">({codigo})</span>
+    </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium">Descripción</label>
-          <input className="w-full border p-2" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+        <input
+          className="w-full mt-1 border border-gray-300 rounded px-4 py-2 text-sm"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">Proveedor</label>
+          <select
+            className="w-full mt-1 border border-gray-300 rounded px-4 py-2 text-sm"
+            value={proveedorId}
+            onChange={(e) => setProveedorId(e.target.value)}
+          >
+            <option value="">Seleccionar</option>
+            {proveedores.map(p => (
+              <option key={p.id} value={p.id}>{p.nombre}</option>
+            ))}
+          </select>
+          <button type="button" className="text-sm text-blue-600 mt-1" onClick={() => setModalProv(true)}>
+            + Nuevo proveedor
+          </button>
         </div>
 
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Proveedor</label>
-            <select className="w-full border p-2" value={proveedorId} onChange={(e) => setProveedorId(e.target.value)}>
-              <option value="">Seleccionar</option>
-              {proveedores.map(p => (
-                <option key={p.id} value={p.id}>{p.nombre}</option>
-              ))}
-            </select>
-            <button type="button" className="text-sm text-blue-600 mt-1" onClick={() => setModalProv(true)}>
-              + Nuevo proveedor
-            </button>
-          </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">Categoría</label>
+          <select
+            className="w-full mt-1 border border-gray-300 rounded px-4 py-2 text-sm"
+            value={categoriaId}
+            onChange={(e) => setCategoriaId(e.target.value)}
+          >
+            <option value="">Seleccionar</option>
+            {categorias.map(c => (
+              <option key={c.id} value={c.id}>{c.nombre}</option>
+            ))}
+          </select>
+          <button type="button" className="text-sm text-blue-600 mt-1" onClick={() => setModalCat(true)}>
+            + Nueva categoría
+          </button>
+        </div>
+      </div>
 
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Categoría</label>
-            <select className="w-full border p-2" value={categoriaId} onChange={(e) => setCategoriaId(e.target.value)}>
-              <option value="">Seleccionar</option>
-              {categorias.map(c => (
-                <option key={c.id} value={c.id}>{c.nombre}</option>
-              ))}
-            </select>
-            <button type="button" className="text-sm text-blue-600 mt-1" onClick={() => setModalCat(true)}>
-              + Nueva categoría
-            </button>
-          </div>
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">Costo</label>
+          <input
+            type="number"
+            className="w-full mt-1 border border-gray-300 rounded px-4 py-2 text-sm"
+            value={costo}
+            onChange={(e) => setCosto(Number(e.target.value))}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">% Margen</label>
+          <input
+            type="number"
+            className="w-full mt-1 border border-gray-300 rounded px-4 py-2 text-sm"
+            value={margen}
+            onChange={(e) => setMargen(Number(e.target.value))}
+          />
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700">Precio de venta</label>
+          <input
+            type="number"
+            disabled
+            className="w-full mt-1 bg-gray-100 border border-gray-300 rounded px-4 py-2 text-sm"
+            value={precioVenta}
+          />
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold text-gray-800 mt-6 mb-2">Variantes</h2>
+
+        <div className="flex gap-2 mb-4">
+          <input
+            className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
+            value={tallesInput}
+            onChange={e => setTallesInput(e.target.value)}
+            placeholder="Talles (ej: S,M,L,XL)"
+          />
+          <input
+            className="border border-gray-300 rounded px-2 py-1 text-sm w-full"
+            value={coloresInput}
+            onChange={e => setColoresInput(e.target.value)}
+            placeholder="Colores (ej: Rojo,Azul,Negro)"
+          />
+          <button
+            type="button"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded"
+            onClick={handleGenerarVariantes}
+          >
+            Generar
+          </button>
         </div>
 
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Costo</label>
-            <input type="number" className="w-full border p-2" value={costo} onChange={(e) => setCosto(Number(e.target.value))} />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium">% Margen</label>
-            <input type="number" className="w-full border p-2" value={margen} onChange={(e) => setMargen(Number(e.target.value))} />
-          </div>
-          <div className="flex-1">
-            <label className="block text-sm font-medium">Precio de venta</label>
-            <input type="number" disabled className="w-full border p-2 bg-gray-100" value={precioVenta} />
-          </div>
-        </div>
-
-        <div>
-          <h2 className="text-lg font-semibold mt-6 mb-2">Variantes</h2>
-          <div className="flex gap-2 mb-2">
-            <input
-              className="border p-1 flex-1"
-              value={tallesInput}
-              onChange={e => setTallesInput(e.target.value)}
-              placeholder="Talles (ej: S,M,L,XL)"
-            />
-            <input
-              className="border p-1 flex-1"
-              value={coloresInput}
-              onChange={e => setColoresInput(e.target.value)}
-              placeholder="Colores (ej: Rojo,Azul,Negro)"
-            />
-            <button
-              type="button"
-              className="bg-blue-600 text-white px-3 py-1 rounded"
-              onClick={handleGenerarVariantes}
-            >
-              Generar variantes
-            </button>
-          </div>
-          <table className="w-full border text-sm">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-2">Talle</th>
-                <th className="p-2">Color</th>
-                <th className="p-2">Stock</th>
-                <th className="p-2">Cod. Barra</th>
-                <th className="p-2"></th>
+        <table className="w-full text-sm border border-gray-200 rounded overflow-hidden">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-2 text-left">Talle</th>
+              <th className="p-2 text-left">Color</th>
+              <th className="p-2 text-left">Stock</th>
+              <th className="p-2 text-left">Cod. Barra</th>
+              <th className="p-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {variantes.map((v, i) => (
+              <tr key={v.id} className="border-t">
+                <td className="p-2">{v.talle}</td>
+                <td className="p-2">{v.color}</td>
+                <td className="p-2">
+                  <input
+                    type="number"
+                    className="border border-gray-300 rounded px-2 py-1 w-20 text-sm"
+                    value={v.stock}
+                    onChange={e => {
+                      const nuevoStock = Number(e.target.value)
+                      setVariantes(variantes.map((variante, idx) =>
+                        idx === i ? { ...variante, stock: nuevoStock } : variante
+                      ))
+                    }}
+                  />
+                </td>
+                <td className="p-2">{v.codBarra}</td>
+                <td className="p-2">
+                  <button
+                    type="button"
+                    className="text-red-600 hover:text-red-800 text-sm"
+                    onClick={() => handleQuitarVariante(v.id)}
+                  >
+                    Quitar
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {variantes.map((v, i) => (
-                <tr key={v.id} className="border-t">
-                  <td className="p-2">{v.talle}</td>
-                  <td className="p-2">{v.color}</td>
-                  <td className="p-2">
-                    <input
-                      type="number"
-                      className="border p-1 w-20"
-                      value={v.stock}
-                      onChange={e => {
-                        const nuevoStock = Number(e.target.value)
-                        setVariantes(variantes.map((variante, idx) =>
-                          idx === i ? { ...variante, stock: nuevoStock } : variante
-                        ))
-                      }}
-                    />
-                  </td>
-                  <td className="p-2">{v.codBarra}</td>
-                  <td className="p-2">
-                    <button
-                      type="button"
-                      className="text-red-600"
-                      onClick={() => setVariantes(variantes.filter((_, idx) => idx !== i))}
-                    >
-                      Quitar
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        <button type="submit" className="bg-green-600 text-white px-6 py-2 rounded mt-4">
+      <div className="flex gap-4 pt-4">
+        <button type="submit" className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm">
           Guardar cambios
         </button>
-        <button type="button" onClick={() => router.push('/articulos')} className="bg-gray-400 text-white px-6 py-2 rounded">
+        <button type="button" onClick={() => router.push('/articulos')} className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded text-sm">
           Cancelar
         </button>
-      </form>
+      </div>
+    </form>
 
-      <ModalProveedor
-        isOpen={modalProv}
-        onClose={() => setModalProv(false)}
-        onCreated={async () => {
-          const res = await fetch('/api/proveedores')
-          const data = await res.json()
-          setProveedores(data)
-        }}
-      />
+    <ModalProveedor
+      isOpen={modalProv}
+      onClose={() => setModalProv(false)}
+      onCreated={async () => {
+        const res = await fetch('/api/proveedores')
+        const data = await res.json()
+        setProveedores(data)
+      }}
+    />
 
-      <ModalCategoria
-        isOpen={modalCat}
-        onClose={() => setModalCat(false)}
-        onCreated={async () => {
-          const res = await fetch('/api/categorias')
-          const data = await res.json()
-          setCategorias(data)
-        }}
-      />
-    </div>
-  )
+    <ModalCategoria
+      isOpen={modalCat}
+      onClose={() => setModalCat(false)}
+      onCreated={async () => {
+        const res = await fetch('/api/categorias')
+        const data = await res.json()
+        setCategorias(data)
+      }}
+    />
+  </div>
+)
 }

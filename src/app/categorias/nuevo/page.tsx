@@ -20,35 +20,36 @@ export default function CrearCategoriaPage() {
   }
 
   return (
-    <div className="p-6 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold mb-4">Nueva Categoría</h1>
+  <div className="p-8 max-w-lg mx-auto">
+    <h1 className="text-2xl font-semibold text-gray-800 mb-6">Nueva Categoría</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          className="w-full p-2 border"
-          placeholder="Nombre de categoría"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-        />
+    <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <input
+        type="text"
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="Nombre de categoría"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        required
+      />
 
-        <div className="flex gap-4">
-          <button
-            type="button"
-            className="px-4 py-2 bg-gray-300 text-black rounded"
-            onClick={() => router.push('/categorias')}
-          >
-            ← Volver
-          </button>
+      <div className="flex gap-4 pt-2">
+        <button
+          type="button"
+          className="bg-gray-400 hover:bg-gray-500 text-white px-6 py-2 rounded text-sm"
+          onClick={() => router.push('/categorias')}
+        >
+          ← Volver
+        </button>
 
-          <button
-            type="submit"
-            className="px-4 py-2 bg-green-600 text-white rounded"
-          >
-            Guardar
-          </button>
-        </div>
-      </form>
-    </div>
-  )
+        <button
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+)
 }

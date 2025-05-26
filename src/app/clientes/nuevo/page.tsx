@@ -37,32 +37,68 @@ export default function NuevoClientePage() {
   }
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Nuevo Cliente</h1>
+  <div className="p-8 max-w-xl mx-auto">
+    <h1 className="text-2xl font-semibold text-gray-800 mb-6">Nuevo Cliente</h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input className="w-full border p-2" placeholder="Nombre" value={nombre} onChange={e => setNombre(e.target.value)} required />
-        <input className="w-full border p-2" placeholder="Apellido" value={apellido} onChange={e => setApellido(e.target.value)} required />
-        <input className="w-full border p-2" placeholder="DNI" value={dni} onChange={e => setDni(e.target.value)} />
-        <input className="w-full border p-2" placeholder="Teléfono" value={telefono} onChange={e => setTelefono(e.target.value)} />
-        <input className="w-full border p-2" placeholder="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-        <input className="w-full border p-2" type="date" value={fechaNac} onChange={e => setFechaNac(e.target.value)} />
+    <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="Nombre"
+        value={nombre}
+        onChange={e => setNombre(e.target.value)}
+        required
+      />
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="Apellido"
+        value={apellido}
+        onChange={e => setApellido(e.target.value)}
+        required
+      />
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="DNI"
+        value={dni}
+        onChange={e => setDni(e.target.value)}
+      />
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="Teléfono"
+        value={telefono}
+        onChange={e => setTelefono(e.target.value)}
+      />
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        placeholder="Email"
+        type="email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+      />
+      <input
+        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
+        type="date"
+        value={fechaNac}
+        onChange={e => setFechaNac(e.target.value)}
+      />
 
-        {error && <p className="text-red-600 font-semibold">{error}</p>}
+      {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
 
-        <div className="flex gap-2">
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded">
-            Guardar
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push('/clientes')}
-            className="bg-gray-400 text-white px-4 py-2 rounded"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </div>
-  )
+      <div className="flex gap-4 pt-2">
+        <button
+          type="submit"
+          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm"
+        >
+          Guardar
+        </button>
+        <button
+          type="button"
+          onClick={() => router.push('/clientes')}
+          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded text-sm"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+)
 }
