@@ -68,9 +68,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/ajuste-stock" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <Wrench size={18} /> Ajuste de Stock
               </Link>
-              <Link href="/importar" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
-                <Upload size={18} /> Importación
-              </Link>
 
               {/* Configuración */}
               <Link href="/proveedores" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
@@ -97,6 +94,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {/* Dashboard */}
               <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
                 <BarChart2 size={18} /> Dashboard
+              </Link>
+              {/* Etiquetas */}
+              <Link href="/etiquetas" className="flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-100 transition">
+                <BarChart2 size={18} /> Etiquetas
               </Link>
             </nav>
           </aside>
