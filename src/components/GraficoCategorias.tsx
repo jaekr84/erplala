@@ -43,7 +43,7 @@ export default function GraficoCategorias() {
               style={{ fontWeight: 600 }}
             />
             {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill="#2563eb" cursor="pointer" />
+              <Cell key={`cell-${index}`} fill="#000" cursor="pointer" />
             ))}
           </Bar>
         </BarChart>

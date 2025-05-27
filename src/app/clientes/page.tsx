@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Cliente } from '@/types'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
@@ -30,78 +32,82 @@ export default function ClientesPage() {
   }, [])
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-6 max-w-6xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Clientes</h1>
         <div className="flex gap-2">
-          <Link href="/">
-            <button className="bg-gray-400 text-white px-3 py-1 rounded">← Inicio</button>
-          </Link>
-          <Link href="/clientes/nuevo">
-            <button className="bg-green-600 text-white px-3 py-1 rounded">+ Nuevo</button>
-          </Link>
+          <Button asChild variant="outline">
+            <Link href="/">← Inicio</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/clientes/nuevo">+ Nuevo</Link>
+          </Button>
         </div>
       </div>
 
-      <input
-        type="text"
+      <Input
         placeholder="Buscar por nombre o DNI"
         value={busqueda}
         onChange={(e) => {
           setPagina(1)
           setBusqueda(e.target.value)
         }}
-        className="border px-3 py-2 mb-4 w-full max-w-md rounded"
+        className="max-w-md"
       />
 
-      {error && <p className="text-red-600 mb-4">{error}</p>}
+      {error && <p className="text-red-600 text-sm">{error}</p>}
 
-      <table className="w-full border text-sm">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 text-left">Nombre</th>
-            <th className="p-2 text-left">DNI</th>
-            <th className="p-2 text-left">Teléfono</th>
-            <th className="p-2 text-left">Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {clientesPagina.length === 0 ? (
+      <div className="border rounded-md overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted text-muted-foreground">
             <tr>
-              <td colSpan={4} className="p-4 text-center text-gray-500">
-                No se encontraron clientes.
-              </td>
+              <th className="p-3 text-left">Nombre</th>
+              <th className="p-3 text-left">DNI</th>
+              <th className="p-3 text-left">Teléfono</th>
+              <th className="p-3 text-left">Email</th>
             </tr>
-          ) : (
-            clientesPagina.map((c) => (
-              <tr key={c.id} className="border-t">
-                <td className="p-2">{c.nombre} {c.apellido}</td>
-                <td className="p-2">{c.dni || '—'}</td>
-                <td className="p-2">{c.telefono || '—'}</td>
-                <td className="p-2">{c.email || '—'}</td>
+          </thead>
+          <tbody>
+            {clientesPagina.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                  No se encontraron clientes.
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              clientesPagina.map((c) => (
+                <tr key={c.id} className="border-t hover:bg-muted/50">
+                  <td className="p-3">{c.nombre} {c.apellido}</td>
+                  <td className="p-3">{c.dni || '—'}</td>
+                  <td className="p-3">{c.telefono || '—'}</td>
+                  <td className="p-3">{c.email || '—'}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      <div className="mt-4 flex justify-center gap-4">
-        <button
+      <div className="flex justify-center items-center gap-4">
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setPagina(p => Math.max(1, p - 1))}
           disabled={pagina === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           ← Anterior
-        </button>
-        <span>Página {pagina} de {totalPaginas}</span>
-        <button
+        </Button>
+        <span className="text-sm text-muted-foreground">Página {pagina} de {totalPaginas}</span>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
           disabled={pagina === totalPaginas}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Siguiente →
-        </button>
+        </Button>
       </div>
     </div>
   )
+
 }

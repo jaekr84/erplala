@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 export default function NuevoClientePage() {
   const router = useRouter()
@@ -35,70 +37,55 @@ export default function NuevoClientePage() {
       setError(data.message || 'Error al crear el cliente')
     }
   }
-
   return (
-  <div className="p-8 max-w-xl mx-auto">
-    <h1 className="text-2xl font-semibold text-gray-800 mb-6">Nuevo Cliente</h1>
+    <div className="p-8 max-w-xl mx-auto space-y-6">
+      <h1 className="text-2xl font-semibold text-gray-800">Nuevo Cliente</h1>
 
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        placeholder="Nombre"
-        value={nombre}
-        onChange={e => setNombre(e.target.value)}
-        required
-      />
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        placeholder="Apellido"
-        value={apellido}
-        onChange={e => setApellido(e.target.value)}
-        required
-      />
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        placeholder="DNI"
-        value={dni}
-        onChange={e => setDni(e.target.value)}
-      />
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        placeholder="Teléfono"
-        value={telefono}
-        onChange={e => setTelefono(e.target.value)}
-      />
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        placeholder="Email"
-        type="email"
-        value={email}
-        onChange={e => setEmail(e.target.value)}
-      />
-      <input
-        className="w-full border border-gray-300 rounded px-4 py-2 text-sm"
-        type="date"
-        value={fechaNac}
-        onChange={e => setFechaNac(e.target.value)}
-      />
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+        <Input
+          placeholder="Nombre"
+          value={nombre}
+          onChange={e => setNombre(e.target.value)}
+          required
+        />
+        <Input
+          placeholder="Apellido"
+          value={apellido}
+          onChange={e => setApellido(e.target.value)}
+          required
+        />
+        <Input
+          placeholder="DNI"
+          value={dni}
+          onChange={e => setDni(e.target.value)}
+        />
+        <Input
+          placeholder="Teléfono"
+          value={telefono}
+          onChange={e => setTelefono(e.target.value)}
+        />
+        <Input
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+        <Input
+          type="date"
+          value={fechaNac}
+          onChange={e => setFechaNac(e.target.value)}
+        />
 
-      {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
+        {error && <p className="text-red-600 text-sm font-medium">{error}</p>}
 
-      <div className="flex gap-4 pt-2">
-        <button
-          type="submit"
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded text-sm"
-        >
-          Guardar
-        </button>
-        <button
-          type="button"
-          onClick={() => router.push('/clientes')}
-          className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded text-sm"
-        >
-          Cancelar
-        </button>
-      </div>
-    </form>
-  </div>
-)
+        <div className="flex gap-4 pt-2 justify-end">
+          <Button type="submit">Guardar</Button>
+          <Button type="button" variant="outline" onClick={() => router.push('/clientes')}>
+            Cancelar
+          </Button>
+        </div>
+      </form>
+    </div>
+  )
+
 }

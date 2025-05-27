@@ -73,7 +73,7 @@ export default function EtiquetasPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold mb-4">🎫 Generar Etiquetas</h1>
+      <h1 className="text-2xl font-bold mb-4"> Generar Etiquetas</h1>
 
       <div className="flex gap-2">
         <Input

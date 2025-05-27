@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type Contador = {
   nombre: string
@@ -62,46 +64,45 @@ export default function PaginaContadores() {
 
   if (loading) return <p className="p-6">Cargando contadores...</p>
 
-  return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Configuración de Contadores</h1>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="text-left p-2">Nombre</th>
-            <th className="text-left p-2">Valor</th>
-            <th className="p-2"></th>
+ return (
+  <div className="p-6 max-w-2xl mx-auto space-y-6">
+    <h1 className="text-2xl font-bold">Configuración de Contadores</h1>
+
+    <div className="border rounded-md overflow-hidden">
+      <table className="w-full text-sm">
+        <thead className="bg-muted text-muted-foreground">
+          <tr>
+            <th className="text-left p-3">Nombre</th>
+            <th className="text-left p-3">Valor</th>
+            <th className="p-3"></th>
           </tr>
         </thead>
         <tbody>
           {contadores.map((c) => (
-            <tr key={c.nombre} className="border-t">
-              <td className="p-2 capitalize">{c.nombre}</td>
-              <td className="p-2">
-                <input
+            <tr key={c.nombre} className="border-t hover:bg-muted/50">
+              <td className="p-3 capitalize">{c.nombre}</td>
+              <td className="p-3">
+                <Input
                   type="number"
                   value={c.valor}
                   onChange={(e) => handleChange(c.nombre, parseInt(e.target.value) || 0)}
-                  className="border p-1 w-24"
+                  className="w-24"
                 />
               </td>
-              <td className="p-2">
-                <button
-                  className="bg-blue-600 text-white px-3 py-1 rounded"
-                  onClick={() => handleGuardar(c.nombre, c.valor)}
-                >
+              <td className="p-3">
+                <Button onClick={() => handleGuardar(c.nombre, c.valor)}>
                   Guardar
-                </button>
+                </Button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      <Link href="/">
-        <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-          ← Volver al inicio
-        </button>
-      </Link>
     </div>
-  )
+
+    <Button asChild variant="outline">
+      <Link href="/">← Volver al inicio</Link>
+    </Button>
+  </div>
+)
 }

@@ -22,9 +22,9 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Estados para cada grupo
   const [openVentas, setOpenVentas] = useState(true)
   const [openCompras, setOpenCompras] = useState(false)
   const [openArticulos, setOpenArticulos] = useState(false)
@@ -36,133 +36,171 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="es">
-      <body className="bg-gray-50 text-gray-800">
+      <body className="bg-muted text-muted-foreground">
         <div className="flex h-screen overflow-hidden">
-          {/* Sidebar */}
-          <aside className="w-64 bg-white border-r p-6 shadow-md flex flex-col overflow-y-auto">
-            <h1 className="text-xl font-bold text-blue-600 mb-6">ERP Lalá</h1>
+          <aside className="w-64 bg-white border-r p-4 shadow-sm flex flex-col overflow-y-auto">
+            <h1 className="text-xl font-bold text-primary mb-4">ERP Lalá</h1>
 
-            {/* Botón Home */}
-            <Link
-              href="/"
-              className="flex items-center gap-3 text-white font-semibold bg-blue-600 rounded-md px-4 py-2 hover:bg-blue-700 transition mb-6"
-            >
-              <Home size={18} /> Inicio
-            </Link>
+            <Button asChild className="mb-4">
+              <Link href="/">
+                <Home size={18} className="mr-2" /> Inicio
+              </Link>
+            </Button>
 
-            {/* Navegación */}
-            <nav className="flex flex-col gap-2 text-sm">
+            <nav className="flex flex-col gap-1 text-sm">
+              {/* Ventas */}
+              <div>
+                <Button
+                  variant="ghost"
+                  className="w-full flex justify-between text-xs text-muted-foreground"
+                  onClick={() => toggle(setOpenVentas)}
+                >
+                  <span>Ventas</span> {openVentas ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openVentas && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/ventas/nueva">
+                        <Receipt size={16} className="mr-2" /> Nueva Venta
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/ventas">
+                        <ListOrdered size={16} className="mr-2" /> Lista de Ventas
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              {/* Grupo Ventas */}
-              <button
-                onClick={() => toggle(setOpenVentas)}
-                className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1"
-              >
-                <span>Ventas</span> {openVentas ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openVentas && (
-                <div className="ml-2">
-                  <Link href="/ventas/nueva" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Receipt size={16} /> Nueva Venta
-                  </Link>
-                  <Link href="/ventas" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <ListOrdered size={16} /> Lista de Ventas
-                  </Link>
-                </div>
-              )}
+              {/* Compras */}
+              <div>
+                <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenCompras)}>
+                  <span>Compras</span> {openCompras ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openCompras && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/compras/nueva">
+                        <ShoppingCart size={16} className="mr-2" /> Nueva Compra
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/compras">
+                        <ListOrdered size={16} className="mr-2" /> Lista de Compras
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              {/* Grupo Compras */}
-              <button onClick={() => toggle(setOpenCompras)} className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1">
-                <span>Compras</span> {openCompras ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openCompras && (
-                <div className="ml-2">
-                  <Link href="/compras/nueva" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <ShoppingCart size={16} /> Nueva Compra
-                  </Link>
-                  <Link href="/compras" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <ListOrdered size={16} /> Lista de Compras
-                  </Link>
-                </div>
-              )}
+              {/* Artículos */}
+              <div>
+                <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenArticulos)}>
+                  <span>Artículos y Stock</span> {openArticulos ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openArticulos && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/articulos">
+                        <Package size={16} className="mr-2" /> Lista de Artículos
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/articulos/nuevo">
+                        <Plus size={16} className="mr-2" /> Nuevo Artículo
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/ajuste-stock">
+                        <Wrench size={16} className="mr-2" /> Ajuste de Stock
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              {/* Grupo Artículos */}
-              <button onClick={() => toggle(setOpenArticulos)} className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1">
-                <span>Artículos y Stock</span> {openArticulos ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openArticulos && (
-                <div className="ml-2">
-                  <Link href="/articulos" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Package size={16} /> Lista de Artículos
-                  </Link>
-                  <Link href="/articulos/nuevo" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Plus size={16} /> Nuevo Artículo
-                  </Link>
-                  <Link href="/ajuste-stock" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Wrench size={16} /> Ajuste de Stock
-                  </Link>
-                </div>
-              )}
+              {/* Clientes */}
+              <div>
+                <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenClientes)}>
+                  <span>Clientes</span> {openClientes ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openClientes && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/clientes">
+                        <Users size={16} className="mr-2" /> Lista de Clientes
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/clientes/nuevo">
+                        <UserPlus size={16} className="mr-2" /> Nuevo Cliente
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              {/* Grupo Clientes */}
-              <button onClick={() => toggle(setOpenClientes)} className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1">
-                <span>Clientes</span> {openClientes ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openClientes && (
-                <div className="ml-2">
-                  <Link href="/clientes" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Users size={16} /> Lista de Clientes
-                  </Link>
-                  <Link href="/clientes/nuevo" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <UserPlus size={16} /> Nuevo Cliente
-                  </Link>
-                </div>
-              )}
+              {/* Configuración */}
+              <div>
+                <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenConfig)}>
+                  <span>Configuración</span> {openConfig ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openConfig && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/proveedores">
+                        <Truck size={16} className="mr-2" /> Proveedores
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/categorias">
+                        <ListOrdered size={16} className="mr-2" /> Categorías
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/medios-pago">
+                        <CreditCard size={16} className="mr-2" /> Medios de Pago
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/contadores">
+                        <Settings size={16} className="mr-2" /> Contadores
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/datosNegocio">
+                        <StoreIcon size={16} className="mr-2" /> Datos del Negocio
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-              {/* Grupo Configuración */}
-              <button onClick={() => toggle(setOpenConfig)} className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1">
-                <span>Configuración</span> {openConfig ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openConfig && (
-                <div className="ml-2">
-                  <Link href="/proveedores" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Truck size={16} /> Proveedores
-                  </Link>
-                  <Link href="/categorias" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <ListOrdered size={16} /> Categorías
-                  </Link>
-                  <Link href="/medios-pago" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <CreditCard size={16} /> Medios de Pago
-                  </Link>
-                  <Link href="/contadores" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <Settings size={16} /> Contadores
-                  </Link>
-                  <Link href="/datosNegocio" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <StoreIcon size={16} /> Datos del Negocio
-                  </Link>
-                </div>
-              )}
-
-              {/* Grupo Utilidades */}
-              <button onClick={() => toggle(setOpenUtilidades)} className="flex justify-between items-center text-xs text-gray-500 uppercase w-full px-1 py-1">
-                <span>Utilidades</span> {openUtilidades ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-              </button>
-              {openUtilidades && (
-                <div className="ml-2">
-                  <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <BarChart2 size={16} /> Dashboard
-                  </Link>
-                  <Link href="/etiquetas" className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition">
-                    <TagIcon size={16} /> Etiquetas
-                  </Link>
-                </div>
-              )}
-
+              {/* Utilidades */}
+              <div>
+                <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenUtilidades)}>
+                  <span>Utilidades</span> {openUtilidades ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openUtilidades && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/dashboard">
+                        <BarChart2 size={16} className="mr-2" /> Dashboard
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/etiquetas">
+                        <TagIcon size={16} className="mr-2" /> Etiquetas
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
             </nav>
           </aside>
 
-          {/* Contenido principal */}
-          <main className="flex-1 overflow-y-auto p-8">{children}</main>
+          <main className="flex-1 overflow-y-auto p-8 bg-muted">{children}</main>
         </div>
       </body>
     </html>
