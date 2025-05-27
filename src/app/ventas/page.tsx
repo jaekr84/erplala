@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 import ModalDetalleVenta from 'lala/components/ModalDetalleVenta'
 import { VentaConDetalles } from '@/types'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Printer, Ticket, Eye } from 'lucide-react'
 
 export default function VentasPage() {
   const [ventas, setVentas] = useState<VentaConDetalles[]>([])
@@ -35,23 +38,24 @@ export default function VentasPage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <h1 className="text-2xl font-semibold text-gray-800 mb-6">Listado de Ventas</h1>
+    <div className="p-8 max-w-6xl mx-auto space-y-6">
+      <h1 className="text-2xl font-semibold text-gray-800">Listado de Ventas</h1>
 
-      <div className="flex gap-4 mb-6">
-        <input
+      {/* Filtros */}
+      <div className="flex flex-wrap items-center gap-4">
+        <Input
           type="date"
           value={desde}
           onChange={e => setDesde(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2 text-sm"
+          className="w-[160px]"
         />
-        <input
+        <Input
           type="date"
           value={hasta}
           onChange={e => setHasta(e.target.value)}
-          className="border border-gray-300 rounded px-4 py-2 text-sm"
+          className="w-[160px]"
         />
-        <input
+        <Input
           type="text"
           placeholder="Buscar por comprobante"
           value={busqueda}
@@ -59,70 +63,93 @@ export default function VentasPage() {
             setBusqueda(e.target.value)
             setPagina(1)
           }}
-          className="flex-1 border border-gray-300 rounded px-4 py-2 text-sm"
+          className="flex-1 min-w-[200px]"
         />
       </div>
 
-      <table className="w-full border border-gray-200 text-sm rounded overflow-hidden">
-        <thead className="bg-gray-100 text-gray-700">
-          <tr>
-            <th className="p-2 text-left">Comprobante</th>
-            <th className="p-2 text-left">Fecha</th>
-            <th className="p-2 text-left">Cliente</th>
-            <th className="p-2 text-left">Total</th>
-            <th className="p-2 text-left">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ventas.map(v => (
-            <tr key={v.id} className="border-t hover:bg-gray-50">
-              <td className="p-2 font-mono cursor-pointer" onClick={() => setVentaSeleccionada(v)}>{v.nroComprobante}</td>
-              <td className="p-2">{new Date(v.fecha).toLocaleDateString()}</td>
-              <td className="p-2">{v.cliente?.nombre || 'Consumidor final'}</td>
-              <td className="p-2">${v.total.toLocaleString('es-AR')}</td>
-              <td className="p-2 space-x-2">
-                <button
-                  onClick={() => imprimirTicket(v.id)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm"
-                >
-                  🖨 Imprimir
-                </button>
-                <button
-                  onClick={() => imprimirCambio(v.id)}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm"
-                >
-                  🎟 Ticket de Cambio
-                </button>
-                <button
-                  className="text-blue-600 hover:underline text-sm"
-                  onClick={() => setVentaSeleccionada(v)}
-                >
-                  Ver detalle
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Tabla de ventas */}
+      <div className="border rounded-md overflow-full shadow-sm">
+        <table className="w-full text-sm">
+          <thead className="bg-muted text-muted-foreground">
+            <tr>
+              <th className="p-3 text-left">Comprobante</th>
+              <th className="p-3 text-left">Fecha</th>
+              <th className="p-3 text-left">Cliente</th>
+              <th className="p-3 text-left">Total</th>
+              <th className="p-3 text-left">T. Venta / T. Cambio</th>
 
-      <div className="flex justify-center items-center gap-4 mt-6 text-sm">
-        <button
-          disabled={pagina <= 1}
-          onClick={() => setPagina(p => p - 1)}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-        >
-          ← Anterior
-        </button>
-        <span className="text-gray-700">Página {pagina} de {totalPaginas}</span>
-        <button
-          disabled={pagina >= totalPaginas}
-          onClick={() => setPagina(p => p + 1)}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded disabled:opacity-50"
-        >
-          Siguiente →
-        </button>
+            </tr>
+          </thead>
+          <tbody>
+            {ventas.map(v => (
+              <tr key={v.id} className="border-t hover:bg-muted/50">
+                <td
+                  className="p-3 font-mono  text-black-600">
+                  {v.nroComprobante}
+                </td>
+                <td className="p-3">{new Date(v.fecha).toLocaleDateString()}</td>
+                <td className="p-3">{v.cliente?.nombre || 'Consumidor final'}</td>
+                <td className="p-3">${v.total.toLocaleString('es-AR')}</td>
+                <td className="flex p-3 space-x-2">
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => imprimirTicket(v.id)}
+                    className="group"
+                  >
+                    <Printer className="w-4 h-4 text-gray-600 group-hover:text-red-600 transition-colors" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => imprimirCambio(v.id)}
+                    className="group"
+                  >
+                    <Ticket className="w-4 h-4 text-gray-600 group-hover:text-red-600 transition-colors" />
+                  </Button>
+
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="flex items-center gap-1 text-black-600 hover:text-red-600 [text-decoration:none]"
+                    onClick={() => setVentaSeleccionada(v)}
+                  >
+                    <Eye className="w-4 h-4" />
+                    Ver detalle
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
+      {/* Paginación */}
+      <div className="flex justify-center items-center gap-6">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={pagina <= 1}
+          onClick={() => setPagina(p => p - 1)}
+        >
+          ← Anterior
+        </Button>
+        <span className="text-sm text-muted-foreground">
+          Página {pagina} de {totalPaginas}
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={pagina >= totalPaginas}
+          onClick={() => setPagina(p => p + 1)}
+        >
+          Siguiente →
+        </Button>
+      </div>
+
+      {/* Modal detalle */}
       {ventaSeleccionada && (
         <ModalDetalleVenta
           venta={ventaSeleccionada}

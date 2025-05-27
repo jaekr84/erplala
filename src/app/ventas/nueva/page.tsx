@@ -6,6 +6,9 @@ import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { VarianteConProducto, MedioPago, Cliente } from '@/types'
 import ModalCrearCliente from '@/components/ModalCrearCliente'
+import { Input } from "@/components/ui/input"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 
 const formatCurrency = (v: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v)
@@ -145,94 +148,112 @@ export default function NuevaVentaPage() {
     }
 
     return (
-        <div className="p-4 max-w-7xl mx-auto space-y-4 text-sm">
-            <div className="grid grid-cols-6 gap-2">
+        <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+            {/* Datos principales */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label>Fecha</label>
-                    <input value={fecha} readOnly className="w-full border p-1 bg-gray-100" />
+                    <label className="text-xs text-muted-foreground">Fecha</label>
+                    <Input value={fecha} readOnly className="bg-muted" />
                 </div>
                 <div>
-                    <label>Comprobante</label>
-                    <input value={nroComprobante} readOnly className="w-full border p-1 bg-gray-100 font-mono" />
+                    <label className="text-xs text-muted-foreground">Comprobante</label>
+                    <Input value={nroComprobante} readOnly className="bg-muted font-mono" />
                 </div>
-                <div className="col-span-2">
-                    <label>Cliente</label>
-                    <select value={clienteId} onChange={e => setClienteId(Number(e.target.value))} className="w-full border p-1">
-                        {clientes.map(c => (
-                            <option key={c.id} value={c.id}>{c.nombre} {c.apellido || ''}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className="col-span-2 flex items-end">
-                    <button className="text-blue-600 text-xs" onClick={() => setModalCliente(true)}>+ Nuevo cliente</button>
+                <div className="md:col-span-2">
+                    <label className="text-xs text-muted-foreground">Cliente</label>
+                    <Select value={String(clienteId)} onValueChange={v => setClienteId(Number(v))}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar cliente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {clientes.map(c => (
+                                <SelectItem key={c.id} value={String(c.id)}>
+                                    {c.nombre} {c.apellido}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Button variant="link" size="sm" className="text-xs px-0" onClick={() => setModalCliente(true)}>
+                        + Nuevo cliente
+                    </Button>
                 </div>
             </div>
 
-            <div className="relative">
-                <input
+            {/* Búsqueda de artículos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
                     placeholder="Buscar artículo"
                     value={busqueda}
                     onChange={e => setBusqueda(e.target.value)}
-                    className="border p-1 text-sm w-full"
                 />
-                {resultados.length > 0 && (
-                    <ul className="absolute z-10 w-full bg-white border shadow max-h-48 overflow-auto">
-                        {resultados.map(v => (
-                            <li
-                                key={v.id}
-                                className="p-2 hover:bg-blue-100 cursor-pointer"
-                                onClick={() => {
-                                    agregarAlDetalle(v)
-                                    setBusqueda('')
-                                    setResultados([])
-                                }}
-                            >
-                                {v.producto.codigo} - {v.producto.descripcion} T:{v.talle} C:{v.color} (${v.producto.precioVenta})
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                <Input
+                    placeholder="Escanear código de barras"
+                    value={codigoBarra}
+                    onChange={e => setCodigoBarra(e.target.value)}
+                />
             </div>
+            {/* Resultados */}
+            {resultados.length > 0 && (
+                <ul className="border rounded shadow bg-white text-sm max-h-48 overflow-auto divide-y mt-1">
+                    {resultados.map(v => (
+                        <li
+                            key={v.id}
+                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
+                            onClick={() => {
+                                agregarAlDetalle(v)
+                                setBusqueda('')
+                                setResultados([])
+                            }}
+                        >
+                            {v.producto.codigo} - {v.producto.descripcion} T:{v.talle} C:{v.color} (${v.producto.precioVenta})
+                        </li>
+                    ))}
+                </ul>
+            )}
 
-            <input
-                placeholder="Código de barras"
-                value={codigoBarra}
-                onChange={e => setCodigoBarra(e.target.value)}
-                className="border p-1 text-sm w-full"
-            />
-
-            <div className="border h-64 overflow-y-auto">
-                <table className="w-full border text-xs">
-                    <thead className="bg-gray-100">
+            {/* Detalle de artículos */}
+            <div className="border rounded max-h-64 overflow-auto text-sm">
+                <table className="w-full text-left">
+                    <thead className="bg-muted text-xs">
                         <tr>
-                            <th className="p-1">Código</th>
-                            <th className="p-1">Descripción</th>
-                            <th className="p-1">Cantidad</th>
-                            <th className="p-1">Precio</th>
-                            <th className="p-1">Subtotal</th>
-                            <th className="p-1"></th>
+                            <th className="p-2">Código</th>
+                            <th className="p-2">Descripción</th>
+                            <th className="p-2 text-right">Cantidad</th>
+                            <th className="p-2 text-right">Precio</th>
+                            <th className="p-2 text-right">Subtotal</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
                         {detalle.map((item, i) => (
                             <tr key={i} className={item.cantidad < 0 ? 'bg-yellow-100' : ''}>
-                                <td className="p-1 font-mono">{item.codigo}</td>
-                                <td className="p-1">{item.descripcion}</td>
-                                <td className="p-1">
-                                    <input
+                                <td className="p-2 font-mono">{item.codigo}</td>
+                                <td className="p-2">{item.descripcion}</td>
+                                <td className="p-2 text-right">
+                                    <Input
                                         type="number"
-                                        value={isNaN(item.cantidad) ? 0 : item.cantidad}
-                                        className="w-16 border px-1 py-0.5 text-right"
-                                        onChange={(e) => {
-                                            const nuevaCantidad = Number(e.target.value)
-                                            setDetalle(prev => prev.map((art, j) => j === i ? { ...art, cantidad: nuevaCantidad } : art))
-                                        }}
+                                        value={item.cantidad}
+                                        className="w-20 text-right"
+                                        onChange={(e) =>
+                                            setDetalle(prev =>
+                                                prev.map((art, j) =>
+                                                    j === i ? { ...art, cantidad: Number(e.target.value) } : art
+                                                )
+                                            )
+                                        }
                                     />
                                 </td>
-                                <td className="p-1">{formatCurrency(item.precio)}</td>
-                                <td className="p-1">{formatCurrency(item.precio * item.cantidad)}</td>
-                                <td className="p-1 text-right">
-                                    <button className="text-red-600 text-xs" onClick={() => setDetalle(prev => prev.filter((_, j) => j !== i))}>✕</button>
+                                <td className="p-2 text-right">{formatCurrency(item.precio)}</td>
+                                <td className="p-2 text-right">{formatCurrency(item.precio * item.cantidad)}</td>
+                                <td className="p-2 text-right">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-red-500"
+                                        onClick={() => setDetalle(prev => prev.filter((_, j) => j !== i))}
+                                    >
+                                        ✕
+                                    </Button>
                                 </td>
                             </tr>
                         ))}
@@ -240,66 +261,93 @@ export default function NuevaVentaPage() {
                 </table>
             </div>
 
-            <div className="grid grid-cols-6 gap-2">
+            {/* Totales y descuentos */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
-                    <label>Desc %</label>
-                    <input type="number" value={descuentoPorc} onChange={e => setDescuentoPorc(Number(e.target.value))} className="w-full border p-1" />
+                    <label className="text-xs">Desc %</label>
+                    <Input type="number" value={descuentoPorc} onChange={e => setDescuentoPorc(Number(e.target.value))} />
                 </div>
                 <div>
-                    <label>Desc manual</label>
-                    <input type="number" value={descuentoManual} onChange={e => setDescuentoManual(e.target.value)} className="w-full border p-1" />
+                    <label className="text-xs">Desc manual</label>
+                    <Input type="number" value={descuentoManual} onChange={e => setDescuentoManual(e.target.value)} />
                 </div>
                 <div>
-                    <label>Subtotal</label>
-                    <input value={subtotal} readOnly className="w-full border p-1 bg-gray-100" />
+                    <label className="text-xs">Unidades</label>
+                    <Input value={unidades} readOnly className="bg-muted" />
                 </div>
                 <div>
-                    <label>Total</label>
-                    <input value={total} readOnly className="w-full border p-1 bg-gray-100 font-bold" />
+                    <label className="text-xs">Subtotal</label>
+                    <Input value={formatCurrency(subtotal)} readOnly className="bg-muted" />
                 </div>
                 <div>
-                    <label>Unidades</label>
-                    <input value={unidades} readOnly className="w-full border p-1 bg-gray-100" />
+                    <label className="text-xs">Total</label>
+                    <Input value={formatCurrency(total)} readOnly className="bg-muted font-bold" />
+                </div>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="text-xs">Pago cliente</label>
+                    <Input type="number" value={pagoCliente} onChange={e => setPagoCliente(Number(e.target.value))} />
                 </div>
                 <div>
-                    <label>Pago cliente</label>
-                    <input type="number" value={pagoCliente} onChange={e => setPagoCliente(Number(e.target.value))} className="w-full border p-1" />
-                </div>
-                <div>
-                    <label>Vuelto</label>
-                    <input value={vuelto > 0 ? vuelto : 0} readOnly className="w-full border p-1 bg-gray-100" />
+                    <label className="text-xs">Vuelto</label>
+                    <Input value={vuelto > 0 ? formatCurrency(vuelto) : '$0'} readOnly className="bg-muted" />
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Medios de pago */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label>Medio de pago 1</label>
-                    <select value={medioPago1} onChange={e => setMedioPago1(e.target.value)} className="w-full border p-1">
-                        <option value="">Seleccionar</option>
-                        {mediosPago.map(m => <option key={m.id} value={m.id}>{m.nombre}</option>)}
-                    </select>
-                    <input type="number" value={montoPago1} onChange={e => handleMontoPago1Change(Number(e.target.value))} className="w-full border p-1 mt-1" placeholder="Monto" />
+                    <label className="text-xs">Medio de pago 1</label>
+                    <Select value={medioPago1} onValueChange={setMedioPago1}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {mediosPago.map(mp => (
+                                <SelectItem key={mp.id} value={String(mp.id)}>{mp.nombre}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Input
+                        type="number"
+                        value={montoPago1}
+                        onChange={e => handleMontoPago1Change(Number(e.target.value))}
+                        className="mt-1"
+                    />
                 </div>
                 <div>
-                    <label>Medio de pago 2</label>
-                    <select value={medioPago2} onChange={e => setMedioPago2(e.target.value)} disabled={!montoPago2} className="w-full border p-1">
-                        <option value="">Seleccionar</option>
-                        {mediosPago.map(m => <option key={m.id} value={m.id}>{m.nombre}</option>)}
-                    </select>
-                    <input type="number" value={montoPago2} readOnly className="w-full border p-1 mt-1 bg-gray-100" placeholder="Monto" />
+                    <label className="text-xs">Medio de pago 2</label>
+                    <Select value={medioPago2} onValueChange={setMedioPago2} disabled={!montoPago2}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {mediosPago.map(mp => (
+                                <SelectItem key={mp.id} value={String(mp.id)}>{mp.nombre}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Input
+                        type="number"
+                        value={montoPago2}
+                        readOnly
+                        className="mt-1 bg-muted"
+                    />
                 </div>
             </div>
 
-            <div className="flex justify-between mt-4">
-                <button onClick={() => router.push('/')} className="px-4 py-2 bg-gray-400 text-white rounded">
+            {/* Botones */}
+            <div className="flex justify-between pt-4">
+                <Button variant="default" onClick={() => router.push('/')}>
                     Cancelar
-                </button>
-                <div className="flex gap-2">
-                    <button onClick={confirmarVenta} className="px-6 py-2 bg-green-600 text-white rounded">
-                        Generar venta
-                    </button>
-                </div>
+                </Button>
+                <Button variant="default" onClick={confirmarVenta} className="text-white">
+                    Generar venta
+                </Button>
             </div>
+
+            {/* Modal crear cliente */}
             <ModalCrearCliente
                 isOpen={modalCliente}
                 onClose={() => setModalCliente(false)}
@@ -307,7 +355,7 @@ export default function NuevaVentaPage() {
                     const res = await fetch('/api/clientes')
                     const data = await res.json()
                     setClientes(data)
-                    setClienteId(data.at(-1).id) // selecciona automáticamente el nuevo
+                    setClienteId(data.at(-1).id)
                 }}
             />
         </div>

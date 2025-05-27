@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Variante } from '@/types'
 import { useRouter } from 'next/navigation'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 export default function AjusteStockPage() {
   const router = useRouter()
@@ -68,7 +70,7 @@ export default function AjusteStockPage() {
         />
         <button
           onClick={buscarArticulo}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-black text-white px-4 py-2 rounded"
         >
           Buscar
         </button>
@@ -122,13 +124,13 @@ export default function AjusteStockPage() {
         <div className="flex justify-between mt-6">
           <button
             onClick={() => router.push('/')}
-            className="bg-gray-400 text-white px-4 py-2 rounded"
+            className="bg-black text-white px-4 py-2 rounded"
           >
             Cancelar
           </button>
           <button
             onClick={confirmarAjuste}
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-black text-white px-4 py-2 rounded"
           >
             Confirmar ajuste
           </button>

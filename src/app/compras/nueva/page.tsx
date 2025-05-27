@@ -6,8 +6,10 @@ import ModalVariantes from '@/components/ModalVariantes'
 import { Proveedor, Articulo, VarianteCompra } from '@/types'
 import { formatCurrency } from '@/utils/format'
 import ModalCrearArticulo from '@/components/ModalCrearArticulo'
-import FormArticulo from '@/components/FormArticulo'
 import ModalProveedor from '@/components/ModalProveedor'
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+
 
 
 export default function NuevaCompraPage() {
@@ -114,52 +116,41 @@ export default function NuevaCompraPage() {
     }
   }
 
+
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Nueva Compra</h1>
+    <div className="p-6 max-w-4xl mx-auto space-y-6">
+      <h1 className="text-2xl font-bold">Nueva Compra</h1>
 
       {/* Fecha y Comprobante */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex gap-4">
         <div>
-          <label className="block text-sm">Fecha</label>
-          <input className="border p-2 bg-gray-100" value={fecha} disabled />
+          <label className="text-sm text-muted-foreground">Fecha</label>
+          <Input value={fecha} disabled className="bg-muted" />
         </div>
         <div>
-          <label className="block text-sm">Comprobante</label>
-          <input className="border p-2 bg-gray-100" value={nroComprobante} disabled />
+          <label className="text-sm text-muted-foreground">Comprobante</label>
+          <Input value={nroComprobante} disabled className="bg-muted" />
         </div>
       </div>
 
       {/* Proveedor */}
-      <div className="mb-4">
-        <label className="block text-sm mb-1">Proveedor</label>
+      <div>
+        <label className="text-sm mb-1 text-muted-foreground block">Proveedor</label>
         <div className="flex gap-2">
-          <input
-            className="border p-2 flex-1"
+          <Input
             placeholder="Buscar proveedor"
             value={proveedorBusqueda}
             onChange={e => setProveedorBusqueda(e.target.value)}
             disabled={!!proveedor}
           />
-          <button
-            type="button"
-            className="bg-blue-600 text-white px-3 py-1 rounded"
-            onClick={() => setProveedorModal(true)}
-          >
-            + Nuevo
-          </button>
+          <Button onClick={() => setProveedorModal(true)}>+ Nuevo</Button>
           {proveedor && (
-            <button
-              type="button"
-              className="bg-gray-400 text-white px-3 py-1 rounded"
-              onClick={() => setProveedor(null)}
-            >
-              Cambiar
-            </button>
+            <Button variant="secondary" onClick={() => setProveedor(null)}>Cambiar</Button>
           )}
         </div>
         {proveedorBusqueda.length > 1 && !proveedor && (
-          <ul className="border mt-1 max-h-32 overflow-auto bg-white">
+          <ul className="border mt-1 max-h-32 overflow-auto bg-white text-sm">
             {proveedores.map(p => (
               <li
                 key={p.id}
@@ -177,45 +168,19 @@ export default function NuevaCompraPage() {
       </div>
 
       {/* Artículos */}
-      <div className="mb-4">
-        <label className="block text-sm">Buscar artículo</label>
+      <div>
+        <label className="text-sm block text-muted-foreground">Buscar artículo</label>
         <div className="flex gap-2">
-          <input
-            className="border p-2 flex-1"
+          <Input
             placeholder="Código o descripción"
             value={articuloBusqueda}
             onChange={e => setArticuloBusqueda(e.target.value)}
           />
-          <button
-            type="button"
-            className="bg-blue-600 text-white px-3 py-1 rounded"
-            onClick={() => setModalVariantes(true)}
-            disabled={!articulos.length}
-          >
-            Agregar
-          </button>
-          <button
-            type="button"
-            className="bg-green-600 text-white px-3 py-1 rounded"
-            onClick={() => setModalCrearArticulo(true)}
-          >
-            Crear artículo
-          </button>
-          {proveedorModal && (
-            <ModalProveedor
-              isOpen={proveedorModal}
-              onClose={() => setProveedorModal(false)}
-              onCreated={async () => {
-                const res = await fetch('/api/proveedores')
-                const data = await res.json()
-                setProveedores(data)
-              }}
-            />
-          )}
-
+          <Button variant="default" onClick={() => setModalVariantes(true)} disabled={!articulos.length}>Agregar</Button>
+          <Button variant="default" onClick={() => setModalCrearArticulo(true)}>Crear artículo</Button>
         </div>
         {articulos.length > 0 && (
-          <ul className="border mt-1 max-h-32 overflow-auto bg-white">
+          <ul className="border mt-1 max-h-32 overflow-auto bg-white text-sm">
             {articulos.map(a => (
               <li
                 key={a.id}
@@ -232,15 +197,6 @@ export default function NuevaCompraPage() {
         )}
       </div>
 
-      {modalVariantes && articuloSeleccionado && (
-        <ModalVariantes
-          articulo={articuloSeleccionado}
-          onClose={() => setModalVariantes(false)}
-          onAgregar={handleAgregarVariantes}
-        />
-      )}
-
-
       {/* Modal Variantes */}
       {modalVariantes && articuloSeleccionado && (
         <ModalVariantes
@@ -251,9 +207,9 @@ export default function NuevaCompraPage() {
       )}
 
       {/* Lista variantes agregadas */}
-      <table className="w-full border text-sm mt-6">
+      <table className="w-full border text-sm">
         <thead>
-          <tr className="bg-gray-100">
+          <tr className="bg-muted">
             <th className="p-2">Código</th>
             <th className="p-2">Descripción</th>
             <th className="p-2">Talle</th>
@@ -272,46 +228,34 @@ export default function NuevaCompraPage() {
               <td className="p-2">{v.codBarra}</td>
               <td className="p-2">{v.descripcion}</td>
               <td className="p-2">{v.talle}</td>
-              <td className="p-2">{v.color}</td>
               <td className="p-2">
-                <input
+                <Input
                   type="number"
-                  className="border p-1 w-20"
                   value={v.costo}
                   onChange={e => {
                     const costo = Number(e.target.value)
-                    setVariantesCompra(prev =>
-                      prev.map((variante, idx) =>
-                        idx === i ? { ...variante, costo } : variante
-                      )
-                    )
+                    setVariantesCompra(prev => prev.map((variante, idx) => idx === i ? { ...variante, costo } : variante))
                   }}
+                  className="w-24"
                 />
               </td>
               <td className="p-2">
-                <input
+                <Input
                   type="number"
-                  className="border p-1 w-16"
                   value={v.cantidad}
                   onChange={e => {
                     const cantidad = Number(e.target.value)
-                    setVariantesCompra(prev =>
-                      prev.map((variante, idx) =>
-                        idx === i ? { ...variante, cantidad } : variante
-                      )
-                    )
+                    setVariantesCompra(prev => prev.map((variante, idx) => idx === i ? { ...variante, cantidad } : variante))
                   }}
+                  className="w-16"
                 />
               </td>
               <td className="p-2">{formatCurrency(v.cantidad * v.costo)}</td>
+              <td className="p-2">{v.codBarra}</td>
               <td className="p-2">
-                <button
-                  type="button"
-                  className="text-red-600"
-                  onClick={() => handleQuitarVariante(v.id)}
-                >
+                <Button variant="link" size="sm" className="text-red-600" onClick={() => handleQuitarVariante(v.id)}>
                   Quitar
-                </button>
+                </Button>
               </td>
             </tr>
           ))}
@@ -319,46 +263,54 @@ export default function NuevaCompraPage() {
       </table>
 
       {/* Totales */}
-      <div className="flex gap-4 mt-6 items-end">
+      <div className="flex gap-4 items-end">
         <div>
-          <label className="block text-sm">Descuento (%)</label>
-          <input
+          <label className="text-sm block text-muted-foreground">Descuento (%)</label>
+          <Input
             type="number"
-            className="border p-2 w-24"
             value={descuento}
             onChange={e => setDescuento(Number(e.target.value))}
             min={0}
             max={100}
+            className="w-24"
           />
         </div>
-        <div className="ml-auto text-right">
+        <div className="ml-auto text-right space-y-1">
           <div>Total cantidades: <strong>{totalCantidades}</strong></div>
           <div>Total bruto: <strong>{formatCurrency(totalBruto)}</strong></div>
           <div>Total neto: <strong>{formatCurrency(totalNeto)}</strong></div>
         </div>
       </div>
 
-      <button
-        className="mt-8 bg-green-600 text-white px-6 py-2 rounded"
-        onClick={handleConfirmar}
-      >
-        Confirmar compra
-      </button>
-      <Link href="/">
-        <button className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-          ← Volver al inicio
-        </button>
-      </Link>
+      <div className="flex justify-between pt-6">
+        <Link href="/">
+          <Button variant="outline">← Volver al inicio</Button>
+        </Link>
+        <Button variant="default" className="bg-black hover:bg-gray-800 text-white">
+          Confirmar compra
+        </Button>
+      </div>
+
       {modalCrearArticulo && (
         <ModalCrearArticulo
           onClose={() => setModalCrearArticulo(false)}
           onArticuloCreado={() => {
-            // recargar lista de artículos
-            setArticuloBusqueda('') // o trigger reload si tenés función específica
+            setArticuloBusqueda('')
           }}
         />
       )}
 
+      {proveedorModal && (
+        <ModalProveedor
+          isOpen={proveedorModal}
+          onClose={() => setProveedorModal(false)}
+          onCreated={async () => {
+            const res = await fetch('/api/proveedores')
+            const data = await res.json()
+            setProveedores(data)
+          }}
+        />
+      )}
     </div>
   )
 }
