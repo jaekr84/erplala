@@ -143,6 +143,7 @@ export default function NuevaCompraPage() {
             value={proveedorBusqueda}
             onChange={e => setProveedorBusqueda(e.target.value)}
             disabled={!!proveedor}
+            className="bg-white"
           />
           <Button onClick={() => setProveedorModal(true)}>+ Nuevo</Button>
           {proveedor && (
@@ -175,6 +176,7 @@ export default function NuevaCompraPage() {
             placeholder="Código o descripción"
             value={articuloBusqueda}
             onChange={e => setArticuloBusqueda(e.target.value)}
+            className='bg-white'
           />
           <Button variant="default" onClick={() => setModalVariantes(true)} disabled={!articulos.length}>Agregar</Button>
           <Button variant="default" onClick={() => setModalCrearArticulo(true)}>Crear artículo</Button>
@@ -207,60 +209,82 @@ export default function NuevaCompraPage() {
       )}
 
       {/* Lista variantes agregadas */}
-      <table className="w-full border text-sm">
-        <thead>
-          <tr className="bg-muted">
-            <th className="p-2">Código</th>
-            <th className="p-2">Descripción</th>
-            <th className="p-2">Talle</th>
-            <th className="p-2">Color</th>
-            <th className="p-2">Costo</th>
-            <th className="p-2">Cantidad</th>
-            <th className="p-2">Subtotal</th>
-            <th className="p-2">Cod. Barra</th>
-            <th className="p-2"></th>
-          </tr>
-        </thead>
-        <tbody>
-          {variantesCompra.map((v, i) => (
-            <tr key={v.id}>
-              <td className="p-2">{v.codigo}</td>
-              <td className="p-2">{v.codBarra}</td>
-              <td className="p-2">{v.descripcion}</td>
-              <td className="p-2">{v.talle}</td>
-              <td className="p-2">
-                <Input
-                  type="number"
-                  value={v.costo}
-                  onChange={e => {
-                    const costo = Number(e.target.value)
-                    setVariantesCompra(prev => prev.map((variante, idx) => idx === i ? { ...variante, costo } : variante))
-                  }}
-                  className="w-24"
-                />
-              </td>
-              <td className="p-2">
-                <Input
-                  type="number"
-                  value={v.cantidad}
-                  onChange={e => {
-                    const cantidad = Number(e.target.value)
-                    setVariantesCompra(prev => prev.map((variante, idx) => idx === i ? { ...variante, cantidad } : variante))
-                  }}
-                  className="w-16"
-                />
-              </td>
-              <td className="p-2">{formatCurrency(v.cantidad * v.costo)}</td>
-              <td className="p-2">{v.codBarra}</td>
-              <td className="p-2">
-                <Button variant="link" size="sm" className="text-red-600" onClick={() => handleQuitarVariante(v.id)}>
-                  Quitar
-                </Button>
-              </td>
+      <div className="border rounded h-64 overflow-y-auto bg-white dark:bg-zinc-900 text-sm">
+        <table className="w-full text-left">
+          <thead className="bg-gray-100 dark:bg-zinc-800 text-xs sticky top-0 z-10">
+            <tr>
+              <th className="p-2">Código</th>
+              <th className="p-2">Descripción</th>
+              <th className="p-2">Talle</th>
+              <th className="p-2">Color</th>
+              <th className="p-2">Costo</th>
+              <th className="p-2">Cantidad</th>
+              <th className="p-2">Subtotal</th>
+              <th className="p-2">Cod. Barra</th>
+              <th className="p-2"></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {variantesCompra.map((v, i) => (
+              <tr
+                key={v.id}
+                className={
+                  i % 2 === 0
+                    ? 'bg-white dark:bg-zinc-900'
+                    : 'bg-gray-50 dark:bg-zinc-800'
+                }
+              >
+                <td className="p-2 font-mono">{v.codigo}</td>
+                <td className="p-2">{v.descripcion}</td>
+                <td className="p-2">{v.talle}</td>
+                <td className="p-2">{v.color}</td>
+                <td className="p-2">
+                  <Input
+                    type="number"
+                    value={v.costo}
+                    onChange={e => {
+                      const costo = Number(e.target.value)
+                      setVariantesCompra(prev =>
+                        prev.map((variante, idx) =>
+                          idx === i ? { ...variante, costo } : variante
+                        )
+                      )
+                    }}
+                    className="w-24"
+                  />
+                </td>
+                <td className="p-2">
+                  <Input
+                    type="number"
+                    value={v.cantidad}
+                    onChange={e => {
+                      const cantidad = Number(e.target.value)
+                      setVariantesCompra(prev =>
+                        prev.map((variante, idx) =>
+                          idx === i ? { ...variante, cantidad } : variante
+                        )
+                      )
+                    }}
+                    className="w-16"
+                  />
+                </td>
+                <td className="p-2 text-right">{formatCurrency(v.cantidad * v.costo)}</td>
+                <td className="p-2 font-mono">{v.codBarra}</td>
+                <td className="p-2">
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-red-600"
+                    onClick={() => handleQuitarVariante(v.id)}
+                  >
+                    Quitar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {/* Totales */}
       <div className="flex gap-4 items-end">
@@ -272,7 +296,8 @@ export default function NuevaCompraPage() {
             onChange={e => setDescuento(Number(e.target.value))}
             min={0}
             max={100}
-            className="w-24"
+            className="w-24 bg-white"
+
           />
         </div>
         <div className="ml-auto text-right space-y-1">

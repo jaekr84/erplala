@@ -26,8 +26,10 @@ export default function DatosNegocioPage() {
     fetch('/api/datosNegocio')
       .then(res => res.json())
       .then(data => {
-        if (!data?.error) setDatos(data)
+        if (data && !data.error) setDatos(data)
+        else setMensaje('❌ Error al cargar los datos')
       })
+      .catch(() => setMensaje('❌ Error al conectar con el servidor'))
   }, [])
 
   const guardar = async () => {
@@ -42,12 +44,12 @@ export default function DatosNegocioPage() {
   }
 
   const actualizar = (campo: keyof DatosNegocio, valor: string) => {
-    setDatos({ ...datos, [campo]: valor })
+    setDatos(prev => ({ ...prev, [campo]: valor }))
   }
 
   return (
     <div className="p-6 max-w-3xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold"> Datos del Negocio</h1>
+      <h1 className="text-2xl font-bold">Datos del Negocio</h1>
 
       <div className="space-y-4">
         <Input value={datos.nombre} onChange={e => actualizar('nombre', e.target.value)} placeholder="Nombre del negocio" />
@@ -64,7 +66,7 @@ export default function DatosNegocioPage() {
       </div>
 
       <div className="flex justify-between items-center">
-        <Button onClick={guardar}> Guardar cambios</Button>
+        <Button onClick={guardar}>Guardar cambios</Button>
         {mensaje && <span className="text-sm text-gray-600">{mensaje}</span>}
       </div>
     </div>

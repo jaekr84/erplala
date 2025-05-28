@@ -110,6 +110,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       </Link>
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/caja/estado">
+                        <WalletCards size={16} className="mr-2" /> Estado de Caja
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/caja/historial">
                         <BookOpenText size={16} className="mr-2" /> Historial de Cajas
                       </Link>

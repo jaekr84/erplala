@@ -1,5 +1,5 @@
-// src/components/FormArticulo.tsx
 'use client'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ModalProveedor from '@/components/ModalProveedor'
@@ -7,7 +7,6 @@ import ModalCategoria from '@/components/ModalCategoria'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import Link from "next/link"
 
 type Props = {
   modo?: 'modal' | 'page'
@@ -62,30 +61,30 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
     setPrecioVenta(redondeado)
   }, [costo, margen])
 
-const generarVariantes = async () => {
-  const t = talles.split(',').map(x => x.trim()).filter(Boolean)
-  const c = colores.split(',').map(x => x.trim()).filter(Boolean)
+  const generarVariantes = async () => {
+    const t = talles.split(',').map(x => x.trim()).filter(Boolean)
+    const c = colores.split(',').map(x => x.trim()).filter(Boolean)
 
-  const combinaciones = t.flatMap(talle => c.map(color => ({ talle, color })))
+    const combinaciones = t.flatMap(talle => c.map(color => ({ talle, color })))
 
-  const promesas = combinaciones.map(() =>
-    fetch('/api/contador/incrementar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre: 'codigoBarras' })
-    }).then(res => res.json())
-  )
+    const promesas = combinaciones.map(() =>
+      fetch('/api/contador/incrementar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: 'codigoBarras' })
+      }).then(res => res.json())
+    )
 
-  const codigos = await Promise.all(promesas)
+    const codigos = await Promise.all(promesas)
 
-  const nuevas = combinaciones.map((combo, i) => ({
-    ...combo,
-    stock: 0,
-    codBarra: String(codigos[i].valor)
-  }))
+    const nuevas = combinaciones.map((combo, i) => ({
+      ...combo,
+      stock: 0,
+      codBarra: String(codigos[i].valor)
+    }))
 
-  setVariantes(nuevas)
-}
+    setVariantes(nuevas)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -138,8 +137,23 @@ const generarVariantes = async () => {
   }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+
+    <div className="p-6 h-auto max-w-5xl mx-auto space-y-6">
       {modo === 'page' && <h1 className="text-xl font-bold">Nuevo Artículo</h1>}
+
+      {modo === 'modal' && (
+        <div className="flex justify-between items-center mb-4">
+          <h2>Nuevo Articulo</h2>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="text-gray-500 hover:text-black"
+          >
+            ✖ Cerrar
+          </Button>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="flex gap-4">
@@ -155,14 +169,14 @@ const generarVariantes = async () => {
 
         <div>
           <label className="text-sm text-muted-foreground">Descripción</label>
-          <Input value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
+          <Input className='bg-white' value={descripcion} onChange={(e) => setDescripcion(e.target.value)} required />
         </div>
 
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Proveedor</label>
             <Select value={proveedorId} onValueChange={setProveedorId}>
-              <SelectTrigger>
+              <SelectTrigger className='bg-white'>
                 <SelectValue placeholder="Seleccionar proveedor" />
               </SelectTrigger>
               <SelectContent>
@@ -179,7 +193,7 @@ const generarVariantes = async () => {
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Categoría</label>
             <Select value={categoriaId} onValueChange={setCategoriaId}>
-              <SelectTrigger>
+              <SelectTrigger className='bg-white'>
                 <SelectValue placeholder="Seleccionar categoría" />
               </SelectTrigger>
               <SelectContent>
@@ -197,26 +211,26 @@ const generarVariantes = async () => {
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Costo</label>
-            <Input type="number" value={costo} onChange={(e) => setCosto(Number(e.target.value))} />
+            <Input className='bg-white' type="number" value={costo} onChange={(e) => setCosto(Number(e.target.value))} />
           </div>
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">% Margen</label>
-            <Input type="number" value={margen} onChange={(e) => setMargen(Number(e.target.value))} />
+            <Input className='bg-white' type="number" value={margen} onChange={(e) => setMargen(Number(e.target.value))} />
           </div>
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Precio de venta</label>
-            <Input type="number" disabled value={precioVenta} className="bg-muted" />
+            <Input className='bg-white' type="number" disabled value={precioVenta} />
           </div>
         </div>
 
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Talles (separados por coma)</label>
-            <Input value={talles} onChange={(e) => setTalles(e.target.value)} />
+            <Input className='bg-white' value={talles} onChange={(e) => setTalles(e.target.value)} />
           </div>
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Colores (separados por coma)</label>
-            <Input value={colores} onChange={(e) => setColores(e.target.value)} />
+            <Input className='bg-white' value={colores} onChange={(e) => setColores(e.target.value)} />
           </div>
         </div>
 
@@ -224,11 +238,13 @@ const generarVariantes = async () => {
           Generar variantes
         </Button>
 
-        {variantes.length > 0 && (
-          <div>
-            <h2 className="text-lg font-semibold mt-6 mb-2">Variantes generadas</h2>
-            <table className="w-full border text-sm">
-              <thead className="bg-muted">
+        {/* Box de variantes siempre visible con altura mínima */}
+        <div>
+          <h2 className="text-lg font-semibold mt-6 mb-2">Variantes generadas</h2>
+
+          <div className="border rounded min-h-64 max-h-64 overflow-y-auto bg-white dark:bg-zinc-900 text-sm">
+            <table className="w-full text-left">
+              <thead className="bg-gray-100 dark:bg-zinc-800 text-xs sticky top-0 z-10">
                 <tr>
                   <th className="p-2">Talle</th>
                   <th className="p-2">Color</th>
@@ -238,7 +254,7 @@ const generarVariantes = async () => {
               </thead>
               <tbody>
                 {variantes.map((v, i) => (
-                  <tr key={i} className="border-t">
+                  <tr key={i} className={i % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800'}>
                     <td className="p-2">{v.talle}</td>
                     <td className="p-2">{v.color}</td>
                     <td className="p-2">
@@ -249,20 +265,18 @@ const generarVariantes = async () => {
                         className="w-20"
                       />
                     </td>
-                    <td className="p-2">{v.codBarra}</td>
+                    <td className="p-2 font-mono">{v.codBarra}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        )}
+        </div>
 
         {errorVariantes && <p className="text-red-600 font-semibold">{errorVariantes}</p>}
 
-        <div className=" justify-end gap-2 mt-6">
-          <Button variant="default" type="submit" className="">
-            Guardar artículo
-          </Button>
+        <div className="justify-end gap-2 mt-6">
+          <Button variant="default" type="submit">Guardar artículo</Button>
         </div>
       </form>
 
