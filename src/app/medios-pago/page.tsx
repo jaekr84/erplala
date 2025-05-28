@@ -70,9 +70,6 @@ export default function MediosPagoPage() {
         onChange={(e) => setNombreNuevo(e.target.value)}
       />
       <Button onClick={crearMedio}>+ Agregar</Button>
-            <Button variant="outline" onClick={() => window.location.href = '/'}>
-        ← Volver al inicio
-      </Button>
     </div>
 
     {error && <p className="text-red-600 text-sm font-medium">{error}</p>}

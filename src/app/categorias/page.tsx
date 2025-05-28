@@ -41,11 +41,6 @@ export default function CategoriasPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold text-gray-800">Listado de Categorías</h1>
         <div className="flex gap-2">
-          <Button asChild variant="default" >
-            <Link href="/" >
-              ← Home
-            </Link>
-          </Button>
             <Button asChild variant="default">
           <Link href="/categorias/nuevo" >
               + Nueva

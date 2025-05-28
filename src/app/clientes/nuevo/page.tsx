@@ -80,9 +80,6 @@ export default function NuevoClientePage() {
 
         <div className="flex gap-4 pt-2 justify-end">
           <Button type="submit">Guardar</Button>
-          <Button type="button" variant="outline" onClick={() => router.push('/clientes')}>
-            Cancelar
-          </Button>
         </div>
       </form>
     </div>

@@ -99,10 +99,6 @@ export default function PaginaContadores() {
         </tbody>
       </table>
     </div>
-
-    <Button asChild variant="outline">
-      <Link href="/">← Volver al inicio</Link>
-    </Button>
   </div>
 )
 }

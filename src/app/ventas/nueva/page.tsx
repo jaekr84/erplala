@@ -338,10 +338,7 @@ export default function NuevaVentaPage() {
             </div>
 
             {/* Botones */}
-            <div className="flex justify-between pt-4">
-                <Button variant="default" onClick={() => router.push('/')}>
-                    Cancelar
-                </Button>
+            <div className="flex justify-end pt-4">
                 <Button variant="default" onClick={confirmarVenta} className="text-white">
                     Generar venta
                 </Button>

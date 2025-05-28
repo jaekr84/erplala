@@ -36,9 +36,6 @@ export default function ClientesPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Clientes</h1>
         <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/">← Inicio</Link>
-          </Button>
           <Button asChild>
             <Link href="/clientes/nuevo">+ Nuevo</Link>
           </Button>

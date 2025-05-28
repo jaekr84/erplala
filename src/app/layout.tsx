@@ -154,6 +154,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       </Link>
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/proveedores/nuevo">
+                        <Truck size={16} className="mr-2" /> Nuevo Proveedor
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/categorias">
                         <ListOrdered size={16} className="mr-2" /> Categorías
                       </Link>

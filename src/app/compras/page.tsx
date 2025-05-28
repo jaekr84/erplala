@@ -55,9 +55,6 @@ export default function ComprasPage() {
           className="w-64"
         />
         <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/">← Volver al inicio</Link>
-          </Button>
           <Button asChild>
             <Link href="/compras/nueva">+ Crear compra</Link>
           </Button>

@@ -56,9 +56,6 @@ return (
         <Button asChild>
           <Link href="/articulos/nuevo">+ Nuevo artículo</Link>
         </Button>
-        <Button asChild variant="outline">
-          <Link href="/">← Volver al inicio</Link>
-        </Button>
       </div>
     </div>
 

@@ -44,9 +44,6 @@ export default function ProveedoresPage() {
       <div className="flex justify-between items-center">
         <h1 className="text-xl font-bold">Listado de Proveedores</h1>
         <div className="flex gap-2">
-          <Button asChild variant="outline">
-            <Link href="/">← Home</Link>
-          </Button>
           <Button asChild>
             <Link href="/proveedores/nuevo">+ Nuevo</Link>
           </Button>

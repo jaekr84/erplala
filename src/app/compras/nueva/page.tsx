@@ -283,9 +283,6 @@ export default function NuevaCompraPage() {
       </div>
 
       <div className="flex justify-between pt-6">
-        <Link href="/">
-          <Button variant="outline">← Volver al inicio</Button>
-        </Link>
         <Button variant="default" className="bg-black hover:bg-gray-800 text-white">
           Confirmar compra
         </Button>
