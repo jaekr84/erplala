@@ -69,6 +69,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <ListOrdered size={16} className="mr-2" /> Lista de Ventas
                       </Link>
                     </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/caja">
+                        <ListOrdered size={16} className="mr-2" /> Apertura de Caja
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/caja/historial">
+                        <ListOrdered size={16} className="mr-2" /> Historial de Cajas
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -202,6 +212,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </div>
                 )}
               </div>
+              
             </nav>
           </aside>
 

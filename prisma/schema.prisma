@@ -170,17 +170,22 @@ model DatosNegocio {
   cuit      String
   pieTicket String
 }
-
-model Usuario {
-  id        Int      @id @default(autoincrement())
-  nombre    String
-  email     String   @unique
-  password  String   // ← Se guarda hasheada
-  rol       RolUsuario @default(VENDEDOR)
-  activo    Boolean  @default(true)
+model Caja {
+  id            Int         @id @default(autoincrement())
+  fechaApertura DateTime
+  fechaCierre   DateTime?
+  montoInicial  Float
+  totalEfectivo Float?
+  totalTarjeta  Float?
+  totalOtro     Float?
+  totalReal     Float?
+  diferencia    Float?
+  observaciones String?
+  estado        EstadoCaja  @default(ABIERTA)
+  detallesPago  Json?
 }
 
-enum RolUsuario {
-  ADMIN
-  VENDEDOR
+enum EstadoCaja {
+  ABIERTA
+  CERRADA
 }

@@ -1,37 +1,29 @@
-// src/app/api/caja/abrir/route.ts
-import { prisma } from 'lala/lib/db'
+import { prisma } from '@/lib/db'
 import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  const { usuarioId, efectivoInicial } = await req.json()
+  const { montoInicial } = await req.json()
 
-  if (!usuarioId || typeof efectivoInicial !== 'number') {
-    return NextResponse.json({ error: 'Datos incompletos' }, { status: 400 })
-  }
-
-  const existeCajaAbierta = await prisma.caja.findFirst({
-    where: { abierta: true }
+  // Verificar si ya hay una caja abierta
+  const cajaAbierta = await prisma.caja.findFirst({
+    where: { estado: 'ABIERTA' },
   })
 
-  if (existeCajaAbierta) {
-    return NextResponse.json({ error: 'Ya hay una caja abierta' }, { status: 400 })
+  if (cajaAbierta) {
+    return NextResponse.json(
+      { error: 'Ya hay una caja abierta' },
+      { status: 400 }
+    )
   }
 
+  // Crear nueva caja
   const nuevaCaja = await prisma.caja.create({
     data: {
-      usuarioId,
-      efectivoInicial
-    }
+      fechaApertura: new Date(),
+      montoInicial: Number(montoInicial),
+      estado: 'ABIERTA',
+    },
   })
-
-  await prisma.auditoriaCaja.create({
-  data: {
-    cajaId: nuevaCaja.id,
-    usuarioId,
-    accion: 'apertura',
-    detalle: `Caja abierta con $${efectivoInicial} inicial`
-  }
-})
 
   return NextResponse.json(nuevaCaja)
 }
