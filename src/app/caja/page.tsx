@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { useRouter } from 'next/navigation'
 
 type Caja = {
   id: number
@@ -26,11 +27,20 @@ export default function CajaPage() {
   const [totalReal, setTotalReal] = useState('')
   const [observaciones, setObservaciones] = useState('')
   const [mensaje, setMensaje] = useState('')
+  const [volver, setVolver] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     fetch('/api/caja/estado')
       .then(res => res.json())
       .then(data => setCaja(data))
+
+    // Solo se ejecuta en cliente
+    if (typeof window !== 'undefined') {
+      const searchParams = new URLSearchParams(window.location.search)
+      const volverParam = searchParams.get('volver')
+      setVolver(volverParam)
+    }
   }, [])
 
   const abrirCaja = async () => {
@@ -45,6 +55,12 @@ export default function CajaPage() {
       const nueva = await res.json()
       setCaja(nueva)
       setMensaje('✅ Caja abierta correctamente')
+
+      if (volver) {
+        router.push(volver)
+      } else {
+        window.location.reload()
+      }
     } else {
       const data = await res.json()
       setMensaje(data.error || 'Error al abrir caja')
@@ -111,7 +127,6 @@ export default function CajaPage() {
             {caja?.detallesPago && (
               <div className="mt-4 space-y-1">
                 <h3 className="font-semibold text-gray-800">Detalle por medio de pago:</h3>
-
                 {Object.entries(caja.detallesPago).map(([medio, monto]) => {
                   const iconos: Record<string, string> = {
                     Efectivo: '',

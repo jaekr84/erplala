@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "lala/lib/db";
 
 export async function POST(req: Request) {
+  const cajaAbierta = await prisma.caja.findFirst({
+    where: { estado: "ABIERTA" },
+  });
+
+  if (!cajaAbierta) {
+    return NextResponse.json(
+      { error: "No se puede realizar una venta sin una caja abierta" },
+      { status: 400 }
+    );
+  }
   try {
     const data = await req.json();
     const { clienteId, fecha, detalle, descuento, total, pagos } = data;

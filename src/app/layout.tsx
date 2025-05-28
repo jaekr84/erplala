@@ -20,9 +20,14 @@ import {
   StoreIcon,
   ChevronDown,
   ChevronRight,
+  WalletCards,
+  BookOpenText,
+  LockKeyhole,
+  LockKeyholeOpen,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [openVentas, setOpenVentas] = useState(true)
@@ -31,8 +36,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const [openClientes, setOpenClientes] = useState(false)
   const [openConfig, setOpenConfig] = useState(false)
   const [openUtilidades, setOpenUtilidades] = useState(false)
-
+  const [openCaja, setOpenCaja] = useState(false)
+  const [cajaAbierta, setCajaAbierta] = useState<boolean | null>(null)
   const toggle = (fn: React.Dispatch<React.SetStateAction<boolean>>) => fn(prev => !prev)
+
+  useEffect(() => {
+    fetch('/api/caja/estado')
+      .then(res => res.json())
+      .then(data => setCajaAbierta(!!data?.id))
+      .catch(() => setCajaAbierta(false))
+  }, [])
 
   return (
     <html lang="es">
@@ -66,17 +79,39 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/ventas">
-                        <ListOrdered size={16} className="mr-2" /> Lista de Ventas
+                        <BookOpenText size={16} className="mr-2" /> Lista de Ventas
                       </Link>
                     </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Caja */}
+              <div>
+                <Button
+                  variant="ghost"
+                  className="w-full flex justify-between text-xs text-muted-foreground"
+                  onClick={() => toggle(setOpenCaja)}
+                >
+                  <span>Caja</span> {openCaja ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openCaja && (
+                  <div className="ml-2 space-y-1">
                     <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link href="/caja">
-                        <ListOrdered size={16} className="mr-2" /> Apertura de Caja
+                      <Link href="/caja" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded">
+                        {cajaAbierta === null ? (
+                          <div className="w-4 h-4 bg-gray-300 rounded-full animate-pulse" />
+                        ) : cajaAbierta ? (
+                          <LockKeyholeOpen className="w-4 h-4 text-green-600" />
+                        ) : (
+                          <LockKeyhole className="w-4 h-4 text-red-600" />
+                        )}
+                        <span>Abrir/Cerrar Caja</span>
                       </Link>
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/caja/historial">
-                        <ListOrdered size={16} className="mr-2" /> Historial de Cajas
+                        <BookOpenText size={16} className="mr-2" /> Historial de Cajas
                       </Link>
                     </Button>
                   </div>
@@ -212,7 +247,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </div>
                 )}
               </div>
-              
+
             </nav>
           </aside>
 

@@ -55,9 +55,18 @@ export default function HistorialCajaPage() {
             className="p-4 bg-white shadow rounded cursor-pointer hover:bg-gray-50"
             onClick={() => setSeleccionada(caja)}
           >
-            <p><strong>Fecha:</strong> {new Date(caja.fechaCierre).toLocaleString()}</p>
-            <p><strong>Total:</strong> ${caja.totalReal.toLocaleString('es-AR')}</p>
-            <p><strong>Diferencia:</strong> ${caja.diferencia.toLocaleString('es-AR')}</p>
+            <p>
+              <strong>Fecha:</strong>{' '}
+              {caja.fechaCierre ? new Date(caja.fechaCierre).toLocaleString() : 'Caja aún abierta'}
+            </p>
+            <p>
+              <strong>Total:</strong>{' '}
+              {caja.totalReal != null ? `$${caja.totalReal.toLocaleString('es-AR')}` : '-'}
+            </p>
+            <p>
+              <strong>Diferencia:</strong>{' '}
+              {caja.diferencia != null ? `$${caja.diferencia.toLocaleString('es-AR')}` : '-'}
+            </p>
           </li>
         ))}
       </ul>
