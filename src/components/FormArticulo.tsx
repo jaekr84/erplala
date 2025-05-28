@@ -62,23 +62,30 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
     setPrecioVenta(redondeado)
   }, [costo, margen])
 
-  const generarVariantes = () => {
-    const t = talles.split(',').map(x => x.trim()).filter(Boolean)
-    const c = colores.split(',').map(x => x.trim()).filter(Boolean)
+const generarVariantes = async () => {
+  const t = talles.split(',').map(x => x.trim()).filter(Boolean)
+  const c = colores.split(',').map(x => x.trim()).filter(Boolean)
 
-    const nuevas = []
-    for (const talle of t) {
-      for (const color of c) {
-        nuevas.push({
-          talle,
-          color,
-          stock: 0,
-          codBarra: `${codigo}-${talle}-${color}`
-        })
-      }
-    }
-    setVariantes(nuevas)
-  }
+  const combinaciones = t.flatMap(talle => c.map(color => ({ talle, color })))
+
+  const promesas = combinaciones.map(() =>
+    fetch('/api/contador/incrementar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombre: 'codigoBarras' })
+    }).then(res => res.json())
+  )
+
+  const codigos = await Promise.all(promesas)
+
+  const nuevas = combinaciones.map((combo, i) => ({
+    ...combo,
+    stock: 0,
+    codBarra: String(codigos[i].valor)
+  }))
+
+  setVariantes(nuevas)
+}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,7 +97,6 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
 
     setErrorVariantes('')
 
-    // ✅ Solo una vez: incrementar contador y obtener el valor real
     const resContador = await fetch('/api/contador/incrementar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -99,16 +105,15 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
     const { valor } = await resContador.json()
     const codigoFinal = valor.toString()
 
-    // ✅ Crear artículo con el código que acabás de generar
     await fetch('/api/articulos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        codigo: codigoFinal, // <-- clave corregida
+        codigo: codigoFinal,
         fecha,
         descripcion,
-        proveedorId,
-        categoriaId,
+        proveedorId: Number(proveedorId),
+        categoriaId: Number(categoriaId),
         costo,
         margen,
         precioVenta,
@@ -123,6 +128,7 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
       router.push('/articulos')
     }
   }
+
   const actualizarVariante = (index: number, campo: keyof typeof variantes[0], valor: string | number) => {
     setVariantes(prev => {
       const copia = [...prev]
@@ -257,11 +263,6 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
           <Button variant="default" type="submit" className="">
             Guardar artículo
           </Button>
-          {modo === 'modal' && (
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
-            </Button>
-          )}
         </div>
       </form>
 

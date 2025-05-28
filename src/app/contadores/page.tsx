@@ -14,7 +14,7 @@ export default function PaginaContadores() {
   const [contadores, setContadores] = useState<Contador[]>([])
   const [loading, setLoading] = useState(true)
 
-  const nombres = ['articulo', 'venta', 'compra']
+  const nombres = ['articulo', 'venta', 'compra', 'codigoBarras']
 
   const fetchContadores = async () => {
   try {
@@ -86,10 +86,10 @@ export default function PaginaContadores() {
                   type="number"
                   value={c.valor}
                   onChange={(e) => handleChange(c.nombre, parseInt(e.target.value) || 0)}
-                  className="w-24"
+                  className="w-35"
                 />
               </td>
-              <td className="p-3">
+              <td className="p-3 text-left">
                 <Button onClick={() => handleGuardar(c.nombre, c.valor)}>
                   Guardar
                 </Button>

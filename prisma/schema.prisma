@@ -170,3 +170,17 @@ model DatosNegocio {
   cuit      String
   pieTicket String
 }
+
+model Usuario {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  email     String   @unique
+  password  String   // ← Se guarda hasheada
+  rol       RolUsuario @default(VENDEDOR)
+  activo    Boolean  @default(true)
+}
+
+enum RolUsuario {
+  ADMIN
+  VENDEDOR
+}
