@@ -48,7 +48,7 @@ export default function NuevaVentaPage() {
     const [cargando, setCargando] = useState(true)
     const [cajaActiva, setCajaActiva] = useState(false)
     const [modalAbierto, setModalAbierto] = useState(false)
-    const [ventaConfirmada, setVentaConfirmada] = useState<{ id: number } | null>(null)
+    const [ventaConfirmada, setVentaConfirmada] = useState<{ id: number; nroComprobante: number } | null>(null)
     const toggleParaCambio = (varianteId: number) => {
         setDetalle(prev =>
             prev.map(item =>
@@ -60,8 +60,33 @@ export default function NuevaVentaPage() {
     }
     const [query, setQuery] = useState('')
     const [sugerencias, setSugerencias] = useState<VarianteConProducto[]>([])
+    const [clienteEmail, setClienteEmail] = useState<string>('')
 
+    const enviarComprobante = async () => {
+        if (!ventaConfirmada?.id) {
+            alert('No hay venta confirmada para enviar el comprobante.')
+            return
+        }
 
+        const resTxt = await fetch(`/api/tickets/venta/${ventaConfirmada.id}/txt`)
+        const texto = await resTxt.text()
+
+        const res = await fetch('/api/enviar-comprobante', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                emailDestino: clienteEmail || 'test@cliente.com',
+                contenido: texto,
+                nombreAdjunto: `comprobante_${ventaConfirmada.id}.txt`
+            })
+        })
+
+        if (res.ok) {
+            alert('📧 Comprobante enviado correctamente')
+        } else {
+            alert('❌ Error al enviar el comprobante')
+        }
+    }
     useEffect(() => {
         const fetchData = async () => {
             if (query.trim().length < 2) return setSugerencias([])
@@ -209,10 +234,11 @@ export default function NuevaVentaPage() {
 
         if (res.ok) {
             const datos = await res.json()
-            setVentaConfirmada({ id: datos.id })
+            setVentaConfirmada({
+                id: datos.id,
+                nroComprobante: datos.nroComprobante ?? datos.id
+            })
             setModalAbierto(true)
-        } else {
-            alert('❌ Error al registrar la venta')
         }
     }
 
@@ -499,18 +525,78 @@ export default function NuevaVentaPage() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                        <Button
+                        {/*<Button
                             variant="default"
-                            onClick={() => window.open(`/api/tickets/venta/${ventaConfirmada?.id}`, '_blank')}
+                            onClick={() =>
+                                window.open(`/api/tickets/venta/${ventaConfirmada?.id}`, '_blank')
+                            }
                         >
                             🧾 Imprimir ticket de venta
                         </Button>
 
                         <Button
                             variant="outline"
-                            onClick={() => window.open(`/api/tickets/cambio/${ventaConfirmada?.id}`, '_blank')}
+                            onClick={() =>
+                                window.open(`/api/tickets/cambio/${ventaConfirmada?.id}`, '_blank')
+                            }
                         >
                             🔁 Imprimir ticket de cambio
+                        </Button>
+
+                        {/* Campo para escribir el email del cliente */}
+                        <Input
+                            type="email"
+                            placeholder="Email del cliente"
+                            value={clienteEmail}
+                            onChange={(e) => setClienteEmail(e.target.value)}
+                        />
+
+                        {/* Botón para enviar comprobante y cambio si corresponde */}
+                        <Button
+                            variant="default"
+                            onClick={async () => {
+                                if (!ventaConfirmada?.id || !clienteEmail) {
+                                    return alert('Falta el ID de la venta o el email')
+                                }
+
+                                // Fecha y comprobante para nombre
+                                const fecha = new Date()
+                                const fechaStr = fecha.toISOString().slice(0, 10)
+                                const nroStr = `V${ventaConfirmada.nroComprobante
+                                    ?.toString()
+                                    .padStart(7, '0') || ventaConfirmada.id}`
+
+                                // Buscar contenido del comprobante de venta
+                                const resVenta = await fetch(`/api/tickets/venta/${ventaConfirmada.id}/txt`)
+                                const contenidoVenta = await resVenta.text()
+
+                                let contenidoCambio = ''
+                                const hayCambio = detalle.some(item => item.paraCambio)
+                                if (hayCambio) {
+                                    const resCambio = await fetch(`/api/tickets/cambio/${ventaConfirmada.id}/txt`)
+                                    contenidoCambio = await resCambio.text()
+                                }
+
+                                const res = await fetch('/api/enviar-comprobante', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        emailDestino: clienteEmail,
+                                        contenidoVenta,
+                                        contenidoCambio: hayCambio ? contenidoCambio : null,
+                                        nombreVenta: `venta_${fechaStr}_${nroStr}.pdf`,
+                                        nombreCambio: hayCambio ? `cambio_${fechaStr}_${nroStr}.pdf` : null
+                                    })
+                                })
+
+                                if (res.ok) {
+                                    alert('📧 Comprobante enviado correctamente')
+                                } else {
+                                    alert('❌ Error al enviar el comprobante')
+                                }
+                            }}
+                        >
+                            📤 Enviar comprobante por email
                         </Button>
 
                         <Button variant="ghost" onClick={() => router.push('/')}>
@@ -519,7 +605,6 @@ export default function NuevaVentaPage() {
                     </div>
                 </DialogContent>
             </Dialog>
-
             {/* Modal crear cliente */}
             <ModalCrearCliente
                 isOpen={modalCliente}

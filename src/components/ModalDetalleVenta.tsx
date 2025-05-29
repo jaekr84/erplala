@@ -8,6 +8,8 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
 import { VentaConDetalles } from '@/types'
 
 type Props = {
@@ -17,6 +19,8 @@ type Props = {
 
 export default function ModalDetalleVenta({ venta, onClose }: Props) {
   const [seleccionados, setSeleccionados] = useState<number[]>([])
+  const [showModal, setShowModal] = useState(false)
+  const [clienteEmail, setClienteEmail] = useState('')
 
   const toggleProducto = (detalleId: number) => {
     setSeleccionados(prev =>
@@ -28,27 +32,59 @@ export default function ModalDetalleVenta({ venta, onClose }: Props) {
 
   const toggleTodos = () => {
     if (seleccionados.length === venta.detalles.length) {
-      setSeleccionados([]) // deseleccionar todos
+      setSeleccionados([])
     } else {
-      setSeleccionados(venta.detalles.map(d => d.id)) // seleccionar todos
+      setSeleccionados(venta.detalles.map(d => d.id))
     }
   }
 
-  const imprimirTicketVenta = () => {
-    window.open(`/api/tickets/venta?ventaId=${venta.id}`, '_blank')
-  }
-
-  const imprimirTicketCambio = () => {
-    if (seleccionados.length === 0) {
-      alert('Debes seleccionar al menos un producto para el ticket de cambio')
+  const enviarComprobantes = async () => {
+    if (!clienteEmail) {
+      toast.error('⚠️ Email faltante', {
+        description: 'Debes ingresar un email válido.'
+      })
       return
     }
 
-    const params = new URLSearchParams()
-    params.set('ventaId', venta.id.toString())
-    seleccionados.forEach(id => params.append('detalleId', id.toString()))
+    const fecha = new Date()
+    const fechaStr = fecha.toISOString().slice(0, 10)
+    const nro = venta.nroComprobante.toString().padStart(7, '0')
 
-    window.open(`/api/tickets/cambio?${params.toString()}`, '_blank')
+    const resVenta = await fetch(`/api/tickets/venta/${venta.id}/txt`)
+    const contenidoVenta = await resVenta.text()
+
+    let contenidoCambio = ''
+    if (seleccionados.length > 0) {
+      const params = new URLSearchParams()
+      params.set('ventaId', venta.id.toString())
+      seleccionados.forEach(id => params.append('detalleId', id.toString()))
+
+      const resCambio = await fetch(`/api/tickets/cambio?${params.toString()}`)
+      contenidoCambio = await resCambio.text()
+    }
+
+    const res = await fetch('/api/enviar-comprobante', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emailDestino: clienteEmail,
+        contenidoVenta,
+        contenidoCambio: contenidoCambio || null,
+        nombreVenta: `venta_${fechaStr}_V${nro}.pdf`,
+        nombreCambio: contenidoCambio ? `cambio_${fechaStr}_V${nro}.pdf` : null
+      })
+    })
+
+    if (res.ok) {
+      toast.success('📧 Enviado correctamente', {
+        description: 'El comprobante fue enviado al cliente.'
+      })
+      setShowModal(false)
+    } else {
+      toast.error('❌ Error al enviar', {
+        description: 'No se pudo enviar el comprobante. Reintentá más tarde.'
+      })
+    }
   }
 
   return (
@@ -113,13 +149,31 @@ export default function ModalDetalleVenta({ venta, onClose }: Props) {
           <Button variant="secondary" onClick={onClose}>
             Cerrar
           </Button>
-          <Button variant="outline" onClick={imprimirTicketCambio}>
-            🎟️ Ticket de cambio
-          </Button>
-          <Button onClick={imprimirTicketVenta}>
-            🖨️ Ticket de venta
+
+          <Button onClick={() => setShowModal(true)}>
+            📤 Enviar comprobante por email
           </Button>
         </div>
+
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>📧 Enviar comprobante</DialogTitle>
+            </DialogHeader>
+
+            <Input
+              type="email"
+              placeholder="Email del cliente"
+              value={clienteEmail}
+              onChange={(e) => setClienteEmail(e.target.value)}
+            />
+
+            <div className="flex justify-end gap-2 mt-4">
+              <Button variant="ghost" onClick={() => setShowModal(false)}>Cancelar</Button>
+              <Button onClick={enviarComprobantes}>Enviar</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   )
