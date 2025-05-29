@@ -250,6 +250,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <TagIcon size={16} className="mr-2" /> Etiquetas
                       </Link>
                     </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/importar">
+                        <TagIcon size={16} className="mr-2" /> Importar
+                      </Link>
+                    </Button>
                   </div>
                 )}
               </div>
