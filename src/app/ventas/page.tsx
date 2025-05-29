@@ -76,7 +76,6 @@ export default function VentasPage() {
               <th className="p-3 text-left">Fecha</th>
               <th className="p-3 text-left">Cliente</th>
               <th className="p-3 text-left">Total</th>
-              <th className="p-3 text-left">T. Venta / T. Cambio</th>
 
             </tr>
           </thead>
@@ -91,24 +90,6 @@ export default function VentasPage() {
                 <td className="p-3">{v.cliente?.nombre || 'Consumidor final'}</td>
                 <td className="p-3">${v.total.toLocaleString('es-AR')}</td>
                 <td className="flex p-3 space-x-2">
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => imprimirTicket(v.id)}
-                    className="group"
-                  >
-                    <Printer className="w-4 h-4 text-gray-600 group-hover:text-red-600 transition-colors" />
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => imprimirCambio(v.id)}
-                    className="group"
-                  >
-                    <Ticket className="w-4 h-4 text-gray-600 group-hover:text-red-600 transition-colors" />
-                  </Button>
 
                   <Button
                     variant="link"

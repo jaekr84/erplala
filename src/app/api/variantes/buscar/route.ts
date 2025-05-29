@@ -1,31 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { NextResponse } from 'next/server'
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
-  const query = searchParams.get('query')?.trim()
+  const q = searchParams.get('q')?.toLowerCase()
 
-  if (!query) {
-    return NextResponse.json([], { status: 200 })
-  }
+  if (!q) return NextResponse.json([])
 
   const variantes = await prisma.variante.findMany({
     where: {
-      OR: [
-        { codBarra: { contains: query } },
-        { producto: {
-            OR: [
-              { descripcion: { contains: query, mode: 'insensitive' } },
-              { codigo: { contains: query } }
-            ]
-          }
-        }
-      ]
+      producto: {
+        OR: [
+          { codigo: { contains: q } },
+          { descripcion: { contains: q, mode: 'insensitive' } }
+        ]
+      }
     },
-    include: {
-      producto: true
-    },
-    take: 20
+    include: { producto: true }
   })
 
   return NextResponse.json(variantes)

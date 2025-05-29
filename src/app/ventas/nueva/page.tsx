@@ -58,6 +58,32 @@ export default function NuevaVentaPage() {
             )
         )
     }
+    const [query, setQuery] = useState('')
+    const [sugerencias, setSugerencias] = useState<VarianteConProducto[]>([])
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            if (query.trim().length < 2) return setSugerencias([])
+
+            const res = await fetch(`/api/variantes/buscar?q=${encodeURIComponent(query)}`)
+            if (!res.ok) return
+
+            const data = await res.json()
+            setSugerencias(data)
+
+            // Autocompletar si hay una sola coincidencia
+            if (data.length === 1) {
+                agregarAlDetalle(data[0])
+                setQuery('')
+                setSugerencias([])
+            }
+        }
+
+        const delay = setTimeout(fetchData, 300)
+        return () => clearTimeout(delay)
+    }, [query])
+
     useEffect(() => {
         fetch('/api/caja/estado')
             .then(res => res.json())
@@ -236,19 +262,44 @@ export default function NuevaVentaPage() {
                 </div>
             </div>
 
-            {/* Búsqueda de artículos */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                    placeholder="Buscar artículo"
-                    value={busqueda}
-                    onChange={e => setBusqueda(e.target.value)}
-                    className='bg-white'
-                />
+                {/* Input de búsqueda + dropdown */}
+                <div className="relative">
+                    <Input
+                        placeholder="Buscar por código o descripción"
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="bg-white"
+                    />
+
+                    {sugerencias.length > 0 && (
+                        <div className="absolute z-50 w-full bg-white border rounded shadow max-h-64 overflow-y-auto mt-1">
+                            {sugerencias.map(v => (
+                                <div
+                                    key={v.id}
+                                    className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                    onClick={() => {
+                                        agregarAlDetalle(v)
+                                        setQuery('')
+                                        setSugerencias([])
+                                    }}
+                                >
+                                    <div className="font-medium">{v.producto.descripcion}</div>
+                                    <div className="text-xs text-gray-500">
+                                        Código: {v.producto.codigo} — Talle: {v.talle} — Color: {v.color}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Input de código de barras */}
                 <Input
                     placeholder="Escanear código de barras"
                     value={codigoBarra}
                     onChange={e => setCodigoBarra(e.target.value)}
-                    className='bg-white'
+                    className="bg-white"
                 />
             </div>
             {/* Resultados */}
@@ -279,26 +330,36 @@ export default function NuevaVentaPage() {
                             <th className="p-2 text-right">Cantidad</th>
                             <th className="p-2 text-right">Precio</th>
                             <th className="p-2 text-right">Subtotal</th>
-                            <th></th>
+                            <th className="p-2 text-right">Eliminar</th>
+                            <th className="p-2 text-center">Tick.Camb.</th>
                         </tr>
                     </thead>
                     <tbody>
                         {detalle.map((item, i) => (
                             <tr
                                 key={i}
-                                className={`${item.cantidad < 0 ? 'bg-yellow-100 dark:bg-yellow-900/40' :
-                                    i % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800'
+                                className={`
+            ${item.cantidad < 0
+                                        ? 'bg-yellow-100 dark:bg-yellow-900/40'
+                                        : i % 2 === 0
+                                            ? 'bg-white dark:bg-zinc-900'
+                                            : 'bg-gray-50 dark:bg-zinc-800'
                                     }`}
                             >
+                                {/* Código */}
                                 <td className="p-2 font-mono">{item.codigo}</td>
+
+                                {/* Descripción */}
                                 <td className="p-2">{item.descripcion}</td>
+
+                                {/* Cantidad */}
                                 <td className="p-2 text-right">
                                     <Input
                                         type="number"
                                         value={item.cantidad}
                                         className="w-20 text-right"
                                         onChange={(e) =>
-                                            setDetalle(prev =>
+                                            setDetalle((prev) =>
                                                 prev.map((art, j) =>
                                                     j === i ? { ...art, cantidad: Number(e.target.value) } : art
                                                 )
@@ -306,19 +367,29 @@ export default function NuevaVentaPage() {
                                         }
                                     />
                                 </td>
+
+                                {/* Precio */}
                                 <td className="p-2 text-right">{formatCurrency(item.precio)}</td>
+
+                                {/* Subtotal */}
                                 <td className="p-2 text-right">{formatCurrency(item.precio * item.cantidad)}</td>
+
+                                {/* Eliminar */}
                                 <td className="p-2 text-right">
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         className="text-red-500"
-                                        onClick={() => setDetalle(prev => prev.filter((_, j) => j !== i))}
+                                        onClick={() =>
+                                            setDetalle((prev) => prev.filter((_, j) => j !== i))
+                                        }
                                     >
                                         ✕
                                     </Button>
                                 </td>
-                                <td>
+
+                                {/* Ticket de cambio */}
+                                <td className="p-2 text-center">
                                     <input
                                         type="checkbox"
                                         checked={item.paraCambio ?? false}
