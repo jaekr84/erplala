@@ -48,7 +48,16 @@ export default function NuevaVentaPage() {
     const [cargando, setCargando] = useState(true)
     const [cajaActiva, setCajaActiva] = useState(false)
     const [modalAbierto, setModalAbierto] = useState(false)
-
+    const [ventaConfirmada, setVentaConfirmada] = useState<{ id: number } | null>(null)
+    const toggleParaCambio = (varianteId: number) => {
+        setDetalle(prev =>
+            prev.map(item =>
+                item.varianteId === varianteId
+                    ? { ...item, paraCambio: !item.paraCambio }
+                    : item
+            )
+        )
+    }
     useEffect(() => {
         fetch('/api/caja/estado')
             .then(res => res.json())
@@ -117,7 +126,8 @@ export default function NuevaVentaPage() {
                 codigo: v.producto.codigo,
                 descripcion: `${v.producto.descripcion} T:${v.talle} C:${v.color}`,
                 cantidad: 1,
-                precio: Number(v.producto.precioVenta) || 0
+                precio: Number(v.producto.precioVenta) || 0,
+                paraCambio: false
             }]
         })
     }
@@ -155,6 +165,7 @@ export default function NuevaVentaPage() {
                 varianteId: item.varianteId,
                 cantidad: item.cantidad,
                 precio: item.precio,
+                paraCambio: item.paraCambio,
             })),
             descuento: descuentoCalculado,
             total,
@@ -171,7 +182,9 @@ export default function NuevaVentaPage() {
         })
 
         if (res.ok) {
-            setModalAbierto(true) // Mostrar modal si todo salió bien
+            const datos = await res.json()
+            setVentaConfirmada({ id: datos.id })
+            setModalAbierto(true)
         } else {
             alert('❌ Error al registrar la venta')
         }
@@ -192,6 +205,7 @@ export default function NuevaVentaPage() {
     return (
 
         <div className="max-w-5xl mx-auto px-4 py-6 space-y-6 ">
+            <p>Nueva Venta</p>
             {/* Datos principales */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
@@ -273,7 +287,7 @@ export default function NuevaVentaPage() {
                             <tr
                                 key={i}
                                 className={`${item.cantidad < 0 ? 'bg-yellow-100 dark:bg-yellow-900/40' :
-                                        i % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800'
+                                    i % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800'
                                     }`}
                             >
                                 <td className="p-2 font-mono">{item.codigo}</td>
@@ -303,6 +317,13 @@ export default function NuevaVentaPage() {
                                     >
                                         ✕
                                     </Button>
+                                </td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={item.paraCambio ?? false}
+                                        onChange={() => toggleParaCambio(item.varianteId)}
+                                    />
                                 </td>
                             </tr>
                         ))}
@@ -397,16 +418,34 @@ export default function NuevaVentaPage() {
             </div>
 
             <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
-                <DialogContent className="max-w-sm text-center">
+                <DialogContent className="max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-green-600">✅ Venta registrada</DialogTitle>
                     </DialogHeader>
-                    <div className="text-sm text-gray-700">
-                        La venta fue registrada correctamente.
+
+                    <div className="text-sm text-gray-600 mb-4">
+                        La venta fue registrada correctamente. ¿Qué querés hacer ahora?
                     </div>
-                    <DialogFooter>
-                        <Button onClick={() => router.push('/')}>Aceptar</Button>
-                    </DialogFooter>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            variant="default"
+                            onClick={() => window.open(`/api/tickets/venta/${ventaConfirmada?.id}`, '_blank')}
+                        >
+                            🧾 Imprimir ticket de venta
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            onClick={() => window.open(`/api/tickets/cambio/${ventaConfirmada?.id}`, '_blank')}
+                        >
+                            🔁 Imprimir ticket de cambio
+                        </Button>
+
+                        <Button variant="ghost" onClick={() => router.push('/')}>
+                            ❌ Cerrar
+                        </Button>
+                    </div>
                 </DialogContent>
             </Dialog>
 

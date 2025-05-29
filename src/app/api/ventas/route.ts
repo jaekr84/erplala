@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "lala/lib/db";
+import { Param } from "@prisma/client/runtime/library";
 
 export async function POST(req: Request) {
   const cajaAbierta = await prisma.caja.findFirst({
@@ -53,6 +54,7 @@ export async function POST(req: Request) {
               varianteId: d.varianteId,
               cantidad: d.cantidad,
               precio: d.precio,
+              paraCambio: d.paraCambio ?? false,
             })),
           },
           pagos: {
@@ -87,7 +89,7 @@ export async function POST(req: Request) {
       return nuevaVenta;
     });
 
-    return NextResponse.json({ ok: true, venta });
+    return NextResponse.json({ id: venta.id, nroComprobante: venta.nroComprobante });
   } catch (error) {
     console.error("❌ Error al registrar venta:", error);
     return NextResponse.json(

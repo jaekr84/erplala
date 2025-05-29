@@ -145,6 +145,7 @@ model VentaDetalle {
   varianteId Int
   cantidad   Int
   precio     Float
+  paraCambio Boolean @default(false)
 }
 
 model MedioPago {
