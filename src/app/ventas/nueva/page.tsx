@@ -22,6 +22,7 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 const formatCurrency = (v: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v)
@@ -48,6 +49,7 @@ export default function NuevaVentaPage() {
     const [cargando, setCargando] = useState(true)
     const [cajaActiva, setCajaActiva] = useState(false)
     const [modalAbierto, setModalAbierto] = useState(false)
+    const [showModal, setShowModal] = useState(false)
     const [ventaConfirmada, setVentaConfirmada] = useState<{ id: number; nroComprobante: number } | null>(null)
     const toggleParaCambio = (varianteId: number) => {
         setDetalle(prev =>
@@ -82,9 +84,14 @@ export default function NuevaVentaPage() {
         })
 
         if (res.ok) {
-            alert('📧 Comprobante enviado correctamente')
+            toast.success('📧 Enviado correctamente', {
+                description: 'El comprobante fue enviado al cliente.'
+            })
+            setShowModal(false)
         } else {
-            alert('❌ Error al enviar el comprobante')
+            toast.error('❌ Error al enviar', {
+                description: 'No se pudo enviar el comprobante. Reintentá más tarde.'
+            })
         }
     }
     useEffect(() => {
@@ -590,9 +597,14 @@ export default function NuevaVentaPage() {
                                 })
 
                                 if (res.ok) {
-                                    alert('📧 Comprobante enviado correctamente')
+                                    toast.success('📧 Enviado correctamente', {
+                                        description: 'El comprobante fue enviado al cliente.'
+                                    })
+                                    setShowModal(false)
                                 } else {
-                                    alert('❌ Error al enviar el comprobante')
+                                    toast.error('❌ Error al enviar', {
+                                        description: 'No se pudo enviar el comprobante. Reintentá más tarde.'
+                                    })
                                 }
                             }}
                         >

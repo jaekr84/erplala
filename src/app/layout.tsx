@@ -28,6 +28,7 @@ import {
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useEffect } from 'react'
+import { Toaster } from 'sonner'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [openVentas, setOpenVentas] = useState(true)
@@ -258,6 +259,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
           <main className="flex-1 overflow-y-auto p-8 bg-muted">{children}</main>
         </div>
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   )
