@@ -165,11 +165,21 @@ export default function NuevaVentaPage() {
         return () => clearTimeout(delay)
     }, [codigoBarra])
 
+
+    // --- Totales y descuentos (declarar antes del useEffect que los necesita) ---
+    const subtotal = detalle.reduce((sum, item) => sum + item.precio * item.cantidad, 0)
+    const unidades = detalle.reduce((sum, item) => sum + item.cantidad, 0)
+    const descuentoCalculado = descuentoManual
+        ? Number(descuentoManual)
+        : Math.ceil((subtotal * (descuentoPorc / 100)) / 1000) * 1000
+    const total = subtotal - descuentoCalculado
+    const vuelto = pagoCliente - total
+
     useEffect(() => {
         setMontoPago1(total)
         setMontoPago2(0)
         setMedioPago2('')
-    }, [detalle])
+    }, [detalle, descuentoCalculado])
 
     const agregarAlDetalle = (v: VarianteConProducto) => {
         setDetalle(prev => {
@@ -190,13 +200,6 @@ export default function NuevaVentaPage() {
         })
     }
 
-    const subtotal = detalle.reduce((sum, item) => sum + item.precio * item.cantidad, 0)
-    const unidades = detalle.reduce((sum, item) => sum + item.cantidad, 0)
-    const descuentoCalculado = descuentoManual
-        ? Number(descuentoManual)
-        : Math.ceil((subtotal * (descuentoPorc / 100)) / 1000) * 1000
-    const total = subtotal - descuentoCalculado
-    const vuelto = pagoCliente - total
 
     const handleMontoPago1Change = (valor: number) => {
         setMontoPago1(valor)
@@ -439,11 +442,29 @@ export default function NuevaVentaPage() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <div>
                     <label className="text-xs">Desc %</label>
-                    <Input className='bg-white' type="number" value={descuentoPorc} onChange={e => setDescuentoPorc(Number(e.target.value))} />
+                    <Input
+                        className='bg-white'
+                        type="number"
+                        value={descuentoPorc}
+                        onChange={e => {
+                            setDescuentoPorc(Number(e.target.value))
+                            setDescuentoManual('') // Limpiar el otro
+                        }}
+                        disabled={!!descuentoManual}
+                    />
                 </div>
                 <div>
                     <label className="text-xs">Desc manual</label>
-                    <Input className='bg-white' type="number" value={descuentoManual} onChange={e => setDescuentoManual(e.target.value)} />
+                    <Input
+                        className='bg-white'
+                        type="number"
+                        value={descuentoManual}
+                        onChange={e => {
+                            setDescuentoManual(e.target.value)
+                            setDescuentoPorc(0) // Limpiar el otro
+                        }}
+                        disabled={!!descuentoPorc}
+                    />
                 </div>
                 <div>
                     <label className="text-xs">Unidades</label>
