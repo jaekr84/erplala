@@ -61,7 +61,21 @@ export default function ImportarPage() {
         Descargar archivo base
       </Button>
 
-      <Input type="file" accept=".csv" onChange={handleArchivo} />
+      <div>
+        <label
+          htmlFor="archivo"
+          className="block w-full cursor-pointer bg-white border border-input rounded px-4 py-2 text-sm text-muted-foreground hover:bg-gray-100 transition"
+        >
+          {archivo?.name || 'Seleccionar archivo CSV'}
+        </label>
+        <input
+          id="archivo"
+          type="file"
+          accept=".csv"
+          onChange={handleArchivo}
+          className="hidden"
+        />
+      </div>
 
       <Button onClick={handleImportar} disabled={cargando}>
         {cargando ? 'Importando...' : 'Importar archivo'}

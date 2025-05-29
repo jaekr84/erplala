@@ -24,6 +24,7 @@ import {
   BookOpenText,
   LockKeyhole,
   LockKeyholeOpen,
+  ImportIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -252,7 +253,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/importar">
-                        <TagIcon size={16} className="mr-2" /> Importar
+                        <ImportIcon size={16} className="mr-2" /> Importar
                       </Link>
                     </Button>
                   </div>
