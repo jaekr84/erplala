@@ -12,7 +12,8 @@ export async function GET(req: Request) {
   }
 
   const desdeDate = parseISO(desde);
-  const hastaDate = parseISO(hasta);
+  const hastaDate = new Date(parseISO(hasta));
+  hastaDate.setHours(23, 59, 59, 999);
 
   const variantes = await prisma.variante.findMany({
     include: {
