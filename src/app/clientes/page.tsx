@@ -5,12 +5,21 @@ import Link from 'next/link'
 import { Cliente } from '@/types'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 export default function ClientesPage() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(1)
   const [error, setError] = useState<string | null>(null)
+  const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null)
+  const [modalAbierto, setModalAbierto] = useState(false)
 
   const clientesFiltrados = clientes.filter(c => {
     const texto = `${c.nombre} ${c.apellido} ${c.dni || ''}`.toLowerCase()
@@ -62,12 +71,13 @@ export default function ClientesPage() {
               <th className="p-3 text-left">DNI</th>
               <th className="p-3 text-left">Teléfono</th>
               <th className="p-3 text-left">Email</th>
+              <th className="p-3 text-left">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {clientesPagina.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                <td colSpan={5} className="p-4 text-center text-muted-foreground">
                   No se encontraron clientes.
                 </td>
               </tr>
@@ -78,6 +88,18 @@ export default function ClientesPage() {
                   <td className="p-3">{c.dni || '—'}</td>
                   <td className="p-3">{c.telefono || '—'}</td>
                   <td className="p-3">{c.email || '—'}</td>
+                  <td className="p-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        setClienteSeleccionado(c)
+                        setModalAbierto(true)
+                      }}
+                    >
+                      Editar
+                    </Button>
+                  </td>
                 </tr>
               ))
             )}
@@ -104,7 +126,97 @@ export default function ClientesPage() {
           Siguiente →
         </Button>
       </div>
+
+      <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar cliente</DialogTitle>
+          </DialogHeader>
+          {clienteSeleccionado && (
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Nombre</label>
+                <Input
+                  value={clienteSeleccionado.nombre}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, nombre: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Apellido</label>
+                <Input
+                  value={clienteSeleccionado.apellido}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, apellido: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">DNI</label>
+                <Input
+                  value={clienteSeleccionado.dni || ''}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, dni: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Teléfono</label>
+                <Input
+                  value={clienteSeleccionado.telefono || ''}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, telefono: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Email</label>
+                <Input
+                  type="email"
+                  value={clienteSeleccionado.email || ''}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, email: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-gray-700">Fecha de nacimiento</label>
+                <Input
+                  type="date"
+                  value={clienteSeleccionado.fechaNac || ''}
+                  onChange={(e) =>
+                    setClienteSeleccionado({ ...clienteSeleccionado, fechaNac: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setModalAbierto(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={async () => {
+                if (!clienteSeleccionado) return;
+                const res = await fetch(`/api/clientes/${clienteSeleccionado.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(clienteSeleccionado),
+                })
+                if (res.ok) {
+                  setClientes((prev) =>
+                    prev.map(c => c.id === clienteSeleccionado.id ? clienteSeleccionado : c)
+                  )
+                  setModalAbierto(false)
+                }
+              }}
+            >
+              Guardar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
-
 }

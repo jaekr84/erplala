@@ -2,6 +2,12 @@
 
 import { useState } from 'react'
 import { Variante } from '@/types'
+type VarianteConProducto = Variante & {
+  producto: {
+    codigo: string
+    descripcion: string
+  }
+}
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -11,6 +17,7 @@ export default function AjusteStockPage() {
   const [busqueda, setBusqueda] = useState('')
   const [resultados, setResultados] = useState<Variante[]>([])
   const [detalle, setDetalle] = useState<any[]>([])
+  const [sugerencias, setSugerencias] = useState<VarianteConProducto[]>([])
 
   const buscarArticulo = async () => {
     if (!busqueda.trim()) return
@@ -27,6 +34,7 @@ export default function AjusteStockPage() {
         ajuste: 0,
         stockNuevo: v.stock
       })))
+      setSugerencias([])
     } else {
       alert('Artículo no encontrado')
     }
@@ -61,13 +69,66 @@ export default function AjusteStockPage() {
       <h1 className="text-2xl font-bold mb-4">Ajuste de Stock</h1>
 
       <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          placeholder="Buscar artículo por código"
-          value={busqueda}
-          onChange={e => setBusqueda(e.target.value)}
-          className="border p-2 flex-1"
-        />
+        <div className="relative w-full flex-1">
+          <input
+            type="text"
+            placeholder="Buscar artículo por código o descripción"
+            value={busqueda}
+            onChange={async e => {
+              const q = e.target.value
+              setBusqueda(q)
+              if (q.trim().length >= 2) {
+                const res = await fetch(`/api/variantes?query=${encodeURIComponent(q)}`)
+                const data = await res.json()
+                if (Array.isArray(data)) setSugerencias(data)
+              } else {
+                setSugerencias([])
+              }
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') buscarArticulo()
+            }}
+            className="border p-2 w-full"
+          />
+          {sugerencias.length > 0 && (() => {
+            // Agrupar sugerencias por producto para mostrar una línea por artículo
+            const productosUnicos = Object.values(
+              sugerencias.reduce((acc, item) => {
+                if (!acc[item.producto.codigo]) {
+                  acc[item.producto.codigo] = item
+                }
+                return acc
+              }, {} as Record<string, VarianteConProducto>)
+            )
+            return (
+              <ul className="absolute z-10 w-full border bg-white text-sm shadow max-h-48 overflow-auto">
+                {productosUnicos.map((v) => (
+                  <li
+                    key={v.producto.codigo}
+                    className="p-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => {
+                      const variantesProducto = sugerencias.filter(s => s.producto.codigo === v.producto.codigo)
+                      setBusqueda(`${v.producto.codigo} - ${v.producto.descripcion}`)
+                      setSugerencias([])
+                      setDetalle(variantesProducto.map(vari => ({
+                        varianteId: vari.id,
+                        codigo: vari.producto.codigo,
+                        descripcion: vari.producto.descripcion,
+                        talle: vari.talle,
+                        color: vari.color,
+                        stockActual: vari.stock,
+                        ajuste: 0,
+                        stockNuevo: vari.stock
+                      })))
+                    }}
+                  >
+                    {v.producto.codigo} - {v.producto.descripcion}
+                  </li>
+                ))}
+              </ul>
+            )
+          })()}
+        </div>
         <button
           onClick={buscarArticulo}
           className="bg-black text-white px-4 py-2 rounded"

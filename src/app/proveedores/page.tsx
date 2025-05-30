@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 type Proveedor = {
   id: number
@@ -14,6 +16,8 @@ type Proveedor = {
 export default function ProveedoresPage() {
   const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [busqueda, setBusqueda] = useState('')
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState<(Proveedor & { direccion?: string }) | null>(null)
+  const [modalAbierto, setModalAbierto] = useState(false)
 
   useEffect(() => {
     const fetchProveedores = async () => {
@@ -70,19 +74,96 @@ export default function ProveedoresPage() {
                   {prov.telefono || 'Sin teléfono'} — {prov.email || 'Sin email'}
                 </p>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-red-600"
-                onClick={() => handleEliminar(prov.id)}
-              >
-                Eliminar
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setProveedorSeleccionado(prov)
+                    setModalAbierto(true)
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-red-600"
+                  onClick={() => handleEliminar(prov.id)}
+                >
+                  Eliminar
+                </Button>
+              </div>
             </li>
           ))}
         </ul>
       )}
+    {/* Modal de edición */}
+    <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Editar proveedor</DialogTitle>
+        </DialogHeader>
+        {proveedorSeleccionado && (
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Nombre</label>
+              <Input
+                value={proveedorSeleccionado.nombre}
+                onChange={(e) =>
+                  setProveedorSeleccionado({ ...proveedorSeleccionado, nombre: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Teléfono</label>
+              <Input
+                value={proveedorSeleccionado.telefono || ''}
+                onChange={(e) =>
+                  setProveedorSeleccionado({ ...proveedorSeleccionado, telefono: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Email</label>
+              <Input
+                type="email"
+                value={proveedorSeleccionado.email || ''}
+                onChange={(e) =>
+                  setProveedorSeleccionado({ ...proveedorSeleccionado, email: e.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-gray-700">Dirección</label>
+              <Input
+                value={proveedorSeleccionado.direccion || ''}
+                onChange={(e) =>
+                  setProveedorSeleccionado({ ...proveedorSeleccionado, direccion: e.target.value })
+                }
+              />
+            </div>
+          </div>
+        )}
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setModalAbierto(false)}>Cancelar</Button>
+          <Button
+            onClick={async () => {
+              const res = await fetch(`/api/proveedores/${proveedorSeleccionado?.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(proveedorSeleccionado),
+              })
+              if (res.ok) window.location.reload()
+            }}
+          >
+            Guardar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
     </div>
   )
 }

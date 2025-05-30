@@ -1,10 +1,11 @@
 import { prisma } from "lala/lib/db"
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, context: any) {
   try {
+    const id = Number(context.params.id)
     await prisma.proveedor.delete({
-      where: { id: Number(params.id) },
+      where: { id },
     })
     return NextResponse.json({ success: true })
   } catch (error) {

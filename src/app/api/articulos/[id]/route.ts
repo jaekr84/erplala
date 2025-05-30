@@ -1,12 +1,8 @@
 import { prisma } from "lala/lib/db"
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 
-type Params = {
-  params: { id: string }
-}
-
-export async function GET(_req: Request, { params }: Params) {
-  const id = Number(params.id)
+export async function GET(_req: NextRequest, context: any) {
+  const id = Number(context.params.id)
 
   // Validar que el id sea un número válido
   if (isNaN(id)) {
@@ -38,8 +34,8 @@ export async function GET(_req: Request, { params }: Params) {
   return NextResponse.json(articulo)
 }
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const id = Number(params.id)
+export async function PUT(req: NextRequest, context: any) {
+  const id = Number(context.params.id)
   const data = await req.json()
   const { descripcion, proveedorId, categoriaId, costo, margen, precioVenta, variantes } = data
 

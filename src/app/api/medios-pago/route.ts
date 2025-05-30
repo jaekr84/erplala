@@ -1,6 +1,6 @@
 import { prisma } from "lala/lib/db";
 import { NextResponse } from "next/server";
-type Params = { params: { id: string } };
+import { NextRequest } from "next/server";
 
 export async function GET() {
   try {
@@ -46,8 +46,8 @@ export async function POST(req: Request) {
     );
   }
 }
-export async function DELETE(_req: Request, { params }: Params) {
-  const id = Number(params.id);
+export async function DELETE(_req: NextRequest, context: any) {
+  const id = Number(context.params.id);
   if (isNaN(id)) {
     return NextResponse.json({ message: "ID inválido" }, { status: 400 });
   }

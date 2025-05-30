@@ -202,11 +202,11 @@ export default function EditarArticuloPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label>Costo</Label>
-            <Input type="number" value={costo} onChange={(e) => setCosto(Number(e.target.value))} />
+            <Input type="number" value={costo === 0 ? '' : costo} onChange={(e) => setCosto(e.target.value === '' ? 0 : Number(e.target.value))} />
           </div>
           <div className="space-y-2">
             <Label>% Margen</Label>
-            <Input type="number" value={margen} onChange={(e) => setMargen(Number(e.target.value))} />
+            <Input type="number" value={margen === 0 ? '' : margen} onChange={(e) => setMargen(e.target.value === '' ? 0 : Number(e.target.value))} />
           </div>
           <div className="space-y-2">
             <Label>Precio de venta</Label>
@@ -243,9 +243,9 @@ export default function EditarArticuloPage() {
                       <Input
                         type="number"
                         className="w-20"
-                        value={v.stock}
+                        value={v.stock === 0 ? '' : v.stock}
                         onChange={e => {
-                          const nuevoStock = Number(e.target.value)
+                          const nuevoStock = e.target.value === '' ? 0 : Number(e.target.value)
                           setVariantes(variantes.map((variante, idx) =>
                             idx === i ? { ...variante, stock: nuevoStock } : variante
                           ))

@@ -211,11 +211,21 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
         <div className="flex gap-4">
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Costo</label>
-            <Input className='bg-white' type="number" value={costo} onChange={(e) => setCosto(Number(e.target.value))} />
+            <Input
+              className='bg-white'
+              type="number"
+              value={costo === 0 ? '' : costo}
+              onChange={(e) => setCosto(e.target.value === '' ? 0 : Number(e.target.value))}
+            />
           </div>
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">% Margen</label>
-            <Input className='bg-white' type="number" value={margen} onChange={(e) => setMargen(Number(e.target.value))} />
+            <Input
+              className='bg-white'
+              type="number"
+              value={margen === 0 ? '' : margen}
+              onChange={(e) => setMargen(e.target.value === '' ? 0 : Number(e.target.value))}
+            />
           </div>
           <div className="flex-1">
             <label className="text-sm text-muted-foreground">Precio de venta</label>
@@ -260,8 +270,8 @@ export default function FormArticulo({ modo = 'page', onClose, onArticuloCreado 
                     <td className="p-2">
                       <Input
                         type="number"
-                        value={v.stock}
-                        onChange={(e) => actualizarVariante(i, 'stock', e.target.value)}
+                        value={v.stock === 0 ? '' : v.stock}
+                        onChange={(e) => actualizarVariante(i, 'stock', e.target.value === '' ? 0 : Number(e.target.value))}
                         className="w-20"
                       />
                     </td>

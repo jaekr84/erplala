@@ -1,12 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from 'lala/lib/db'
 
-type Params = {
-  params: { codigo: string }
-}
-
-export async function GET(_req: Request, { params }: Params) {
-  const { codigo } = params
+export async function GET(_req: NextRequest, context: any) {
+  const { codigo } = context.params
 
   if (!codigo) {
     return NextResponse.json({ message: 'Código no proporcionado' }, { status: 400 })

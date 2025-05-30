@@ -137,66 +137,71 @@ export default function NuevaCompraPage() {
       {/* Proveedor */}
       <div>
         <label className="text-sm mb-1 text-muted-foreground block">Proveedor</label>
-        <div className="flex gap-2">
-          <Input
-            placeholder="Buscar proveedor"
-            value={proveedorBusqueda}
-            onChange={e => setProveedorBusqueda(e.target.value)}
-            disabled={!!proveedor}
-            className="bg-white"
-          />
-          <Button onClick={() => setProveedorModal(true)}>+ Nuevo</Button>
-          {proveedor && (
-            <Button variant="secondary" onClick={() => setProveedor(null)}>Cambiar</Button>
+        <div className="relative">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Buscar proveedor"
+              value={proveedorBusqueda}
+              onChange={e => setProveedorBusqueda(e.target.value)}
+              disabled={!!proveedor}
+              className="bg-white"
+            />
+            <Button onClick={() => setProveedorModal(true)}>+ Nuevo</Button>
+            {proveedor && (
+              <Button variant="secondary" onClick={() => setProveedor(null)}>Cambiar</Button>
+            )}
+          </div>
+          {proveedorBusqueda.length > 1 && !proveedor && (
+            <ul className="absolute z-10 w-full border mt-1 max-h-32 overflow-auto bg-white text-sm shadow-lg">
+              {proveedores.map(p => (
+                <li
+                  key={p.id}
+                  className="p-2 hover:bg-blue-100 cursor-pointer"
+                  onClick={() => {
+                    setProveedor(p)
+                    setProveedores([])
+                  }}
+                >
+                  {p.nombre}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-        {proveedorBusqueda.length > 1 && !proveedor && (
-          <ul className="border mt-1 max-h-32 overflow-auto bg-white text-sm">
-            {proveedores.map(p => (
-              <li
-                key={p.id}
-                className="p-2 hover:bg-blue-100 cursor-pointer"
-                onClick={() => setProveedor(p)}
-              >
-                {p.nombre}
-              </li>
-            ))}
-          </ul>
-        )}
-        {proveedor && (
-          <div className="mt-1 text-green-700 font-semibold">{proveedor.nombre}</div>
-        )}
       </div>
 
       {/* Artículos */}
       <div>
         <label className="text-sm block text-muted-foreground">Buscar artículo</label>
-        <div className="flex gap-2">
-          <Input
-            placeholder="Código o descripción"
-            value={articuloBusqueda}
-            onChange={e => setArticuloBusqueda(e.target.value)}
-            className='bg-white'
-          />
-          <Button variant="default" onClick={() => setModalVariantes(true)} disabled={!articulos.length}>Agregar</Button>
-          <Button variant="default" onClick={() => setModalCrearArticulo(true)}>Crear artículo</Button>
+        <div className="relative">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Código o descripción"
+              value={articuloBusqueda}
+              onChange={e => setArticuloBusqueda(e.target.value)}
+              className='bg-white'
+            />
+            <Button variant="default" onClick={() => setModalVariantes(true)} disabled={!articulos.length}>Agregar</Button>
+            <Button variant="default" onClick={() => setModalCrearArticulo(true)}>Crear artículo</Button>
+          </div>
+          {articulos.length > 0 && (
+            <ul className="absolute z-10 w-full border mt-1 max-h-32 overflow-auto bg-white text-sm shadow-lg">
+              {articulos.map(a => (
+                <li
+                  key={a.id}
+                  className="p-2 hover:bg-blue-100 cursor-pointer"
+                  onClick={() => {
+                    setArticuloSeleccionado(a)
+                    setModalVariantes(true)
+                    setArticulos([])
+                  }}
+                >
+                  {a.codigo} - {a.descripcion}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        {articulos.length > 0 && (
-          <ul className="border mt-1 max-h-32 overflow-auto bg-white text-sm">
-            {articulos.map(a => (
-              <li
-                key={a.id}
-                className="p-2 hover:bg-blue-100 cursor-pointer"
-                onClick={() => {
-                  setArticuloSeleccionado(a)
-                  setModalVariantes(true)
-                }}
-              >
-                {a.codigo} - {a.descripcion}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
       {/* Modal Variantes */}
@@ -211,7 +216,7 @@ export default function NuevaCompraPage() {
       {/* Lista variantes agregadas */}
       <div className="border rounded h-64 overflow-y-auto bg-white dark:bg-zinc-900 text-sm">
         <table className="w-full text-left">
-          <thead className="bg-gray-100 dark:bg-zinc-800 text-xs sticky top-0 z-10">
+          <thead className="bg-gray-100 dark:bg-zinc-800 text-xs">
             <tr>
               <th className="p-2">Código</th>
               <th className="p-2">Descripción</th>
@@ -241,9 +246,10 @@ export default function NuevaCompraPage() {
                 <td className="p-2">
                   <Input
                     type="number"
-                    value={v.costo}
+                    value={v.costo === 0 ? '' : v.costo}
                     onChange={e => {
-                      const costo = Number(e.target.value)
+                      const value = e.target.value
+                      const costo = value === '' ? 0 : Number(value)
                       setVariantesCompra(prev =>
                         prev.map((variante, idx) =>
                           idx === i ? { ...variante, costo } : variante
@@ -256,9 +262,10 @@ export default function NuevaCompraPage() {
                 <td className="p-2">
                   <Input
                     type="number"
-                    value={v.cantidad}
+                    value={v.cantidad === 0 ? '' : v.cantidad}
                     onChange={e => {
-                      const cantidad = Number(e.target.value)
+                      const value = e.target.value
+                      const cantidad = value === '' ? 0 : Number(value)
                       setVariantesCompra(prev =>
                         prev.map((variante, idx) =>
                           idx === i ? { ...variante, cantidad } : variante
@@ -292,8 +299,11 @@ export default function NuevaCompraPage() {
           <label className="text-sm block text-muted-foreground">Descuento (%)</label>
           <Input
             type="number"
-            value={descuento}
-            onChange={e => setDescuento(Number(e.target.value))}
+            value={descuento === 0 ? '' : descuento}
+            onChange={e => {
+              const value = e.target.value
+              setDescuento(value === '' ? 0 : Number(value))
+            }}
             min={0}
             max={100}
             className="w-24 bg-white"

@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { prisma } from "lala/lib/db";
 
 // ✅ GET: Listar artículos con búsqueda y paginación
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get("query") || "";
   const pagina = parseInt(searchParams.get("pagina") || "1", 10);
@@ -57,7 +57,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const data = await req.json()
 
   console.log('📥 Datos recibidos:', data)
