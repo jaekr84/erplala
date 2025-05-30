@@ -39,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const [openConfig, setOpenConfig] = useState(false)
   const [openUtilidades, setOpenUtilidades] = useState(false)
   const [openCaja, setOpenCaja] = useState(false)
+  const [openDashboard, setOpenDashboard] = useState(false)
   const [cajaAbierta, setCajaAbierta] = useState<boolean | null>(null)
   const toggle = (fn: React.Dispatch<React.SetStateAction<boolean>>) => fn(prev => !prev)
 
@@ -234,6 +235,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 )}
               </div>
 
+              {/* Dashboard */}
+              <div>
+                <Button
+                  variant="ghost"
+                  className="w-full flex justify-between text-xs text-muted-foreground"
+                  onClick={() => toggle(setOpenDashboard)}
+                >
+                  <span>Dashboard</span> {openDashboard ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                </Button>
+                {openDashboard && (
+                  <div className="ml-2 space-y-1">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/dashboard">
+                        <BarChart2 size={16} className="mr-2" /> Dashboard General
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/dashboard/rotacion">
+                        <BarChart2 size={16} className="mr-2" /> Rotación de Artículos
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link href="/dashboard/ranking">
+                        <BarChart2 size={16} className="mr-2" /> Ranking de Artículos
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               {/* Utilidades */}
               <div>
                 <Button variant="ghost" className="w-full flex justify-between text-xs text-muted-foreground" onClick={() => toggle(setOpenUtilidades)}>
@@ -241,11 +272,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Button>
                 {openUtilidades && (
                   <div className="ml-2 space-y-1">
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link href="/dashboard">
-                        <BarChart2 size={16} className="mr-2" /> Dashboard
-                      </Link>
-                    </Button>
                     <Button asChild variant="ghost" className="w-full justify-start">
                       <Link href="/etiquetas">
                         <TagIcon size={16} className="mr-2" /> Etiquetas
