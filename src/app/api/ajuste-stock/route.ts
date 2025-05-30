@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
-import { prisma } from 'lala/lib/db'
+import { prisma } from '../../../lib/db'
 
-export async function POST(req: Request) {
+export async function POST(request: Request, _context: { params: {} }) {
   try {
-    const ajustes = await req.json()
+    const ajustes = await request.json()
 
     if (!Array.isArray(ajustes) || ajustes.length === 0) {
       return NextResponse.json({ message: 'No hay ajustes' }, { status: 400 })
