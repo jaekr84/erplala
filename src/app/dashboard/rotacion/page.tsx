@@ -13,6 +13,13 @@ import {
   SelectItem
 } from '@/components/ui/select'
 import React from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
 
 type Variante = {
   id: number
@@ -43,19 +50,16 @@ export default function RotacionPage() {
   const [desde, setDesde] = useState(format(new Date(), 'yyyy-MM-01'))
   const [hasta, setHasta] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [articulos, setArticulos] = useState<Articulo[]>([])
-  const [expandidos, setExpandidos] = useState<string[]>([])
   const [categoria, setCategoria] = useState<string>('')
+
+  const [modalAbierto, setModalAbierto] = useState(false)
+  const [variantesSeleccionadas, setVariantesSeleccionadas] = useState<Variante[] | null>(null)
+  const [tituloModal, setTituloModal] = useState('')
 
   const buscar = async () => {
     const res = await fetch(`/api/dashboard/rotacion?desde=${desde}&hasta=${hasta}`)
     const data = await res.json()
     setArticulos(data)
-  }
-
-  const toggleExpandido = (codigo: string) => {
-    setExpandidos(prev =>
-      prev.includes(codigo) ? prev.filter(c => c !== codigo) : [...prev, codigo]
-    )
   }
 
   // Filtrado y ordenamiento
@@ -82,63 +86,37 @@ export default function RotacionPage() {
         </thead>
         <tbody>
           {data.map(a => (
-            <React.Fragment key={a.codigo}>
-              <tr className={a.alerta ? 'bg-red-100 font-semibold' : ''}>
-                <td className="p-2 cursor-pointer text-blue-600 underline" onClick={() => toggleExpandido(a.codigo)}>{a.codigo}</td>
-                <td className="p-2">{a.descripcion}</td>
-                <td className="p-2 text-center">{format(new Date(a.fechaAlta), 'dd/MM/yyyy')}</td>
-                <td className="p-2 text-center">{a.ventasTotales}</td>
-                <td className="p-2 text-center">{a.rotacionSemanal.toFixed(2)}</td>
-                <td className="p-2 text-center">{a.stockTotal}</td>
-                <td className="p-2 text-center">
-                  {a.ultimaVenta ? format(new Date(a.ultimaVenta), 'dd/MM/yyyy') : '-'}
-                </td>
-                <td className="p-2 text-center">
-                  {a.etiqueta === 'altisima' ? '🔥'
-                    : a.etiqueta === 'alta' ? '⚡'
-                    : a.etiqueta === 'media' ? '⏳'
-                    : a.etiqueta === 'baja' ? '💤'
-                    : '🛑'}
-                </td>
-                <td className="p-2 text-center">
-                  <button onClick={() => toggleExpandido(a.codigo)}>
-                    {expandidos.includes(a.codigo) ? '▲' : '▼'}
-                  </button>
-                </td>
-              </tr>
-              {expandidos.includes(a.codigo) && (
-                <tr>
-                  <td colSpan={9} className="p-2 bg-gray-50">
-                    <table className="w-full text-xs border mt-2">
-                      <thead className="bg-gray-200">
-                        <tr>
-                          <th className="p-1">Talle</th>
-                          <th className="p-1">Color</th>
-                          <th className="p-1">Stock</th>
-                          <th className="p-1">Ventas</th>
-                          <th className="p-1">Rot. Semanal</th>
-                          <th className="p-1">Últ. Venta</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {a.variantes.map(v => (
-                          <tr key={v.id}>
-                            <td className="p-1 text-center">{v.talle}</td>
-                            <td className="p-1 text-center">{v.color}</td>
-                            <td className="p-1 text-center">{v.stock}</td>
-                            <td className="p-1 text-center">{v.ventas}</td>
-                            <td className="p-1 text-center">{v.rotacionSemanal.toFixed(2)}</td>
-                            <td className="p-1 text-center">
-                              {v.ultimaVenta ? format(new Date(v.ultimaVenta), 'dd/MM/yyyy') : '-'}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              )}
-            </React.Fragment>
+            <tr
+              key={a.codigo}
+              className={`cursor-pointer ${a.alerta ? 'bg-red-100 font-semibold' : ''} hover:bg-gray-100`}
+              onClick={() => {
+                setVariantesSeleccionadas(a.variantes)
+                setTituloModal(`${a.codigo} - ${a.descripcion}`)
+                setModalAbierto(true)
+              }}
+            >
+              <td className="p-2 text-blue-600">{a.codigo}</td>
+              <td className="p-2">{a.descripcion}</td>
+              <td className="p-2 text-center">{format(new Date(a.fechaAlta), 'dd/MM/yyyy')}</td>
+              <td className="p-2 text-center">{a.ventasTotales}</td>
+              <td className="p-2 text-center">{a.rotacionSemanal.toFixed(2)}</td>
+              <td className="p-2 text-center">{a.stockTotal}</td>
+              <td className="p-2 text-center">
+                {a.ultimaVenta ? format(new Date(a.ultimaVenta), 'dd/MM/yyyy') : '-'}
+              </td>
+              <td className="p-2 text-center">
+                {a.etiqueta === 'altisima' ? '🔥'
+                  : a.etiqueta === 'alta' ? '⚡'
+                  : a.etiqueta === 'media' ? '⏳'
+                  : a.etiqueta === 'baja' ? '💤'
+                  : '🛑'}
+              </td>
+              <td className="p-2 text-center">
+                <button>
+                  ▼
+                </button>
+              </td>
+            </tr>
           ))}
         </tbody>
       </table>
@@ -164,6 +142,45 @@ export default function RotacionPage() {
         <div className="space-y-6">
           <Tabla titulo="📦 Todos los artículos (ordenados por rotación)" data={articulosFiltrados} />
         </div>
+      )}
+
+      {modalAbierto && variantesSeleccionadas && (
+        <Dialog open={modalAbierto} onOpenChange={setModalAbierto}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>📦 Variantes de {tituloModal}</DialogTitle>
+            </DialogHeader>
+            <table className="w-full text-xs border mt-2">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="p-1">Talle</th>
+                  <th className="p-1">Color</th>
+                  <th className="p-1">Stock</th>
+                  <th className="p-1">Ventas</th>
+                  <th className="p-1">Rot. Semanal</th>
+                  <th className="p-1">Últ. Venta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {variantesSeleccionadas.map(v => (
+                  <tr key={v.id}>
+                    <td className="p-1 text-center">{v.talle}</td>
+                    <td className="p-1 text-center">{v.color}</td>
+                    <td className="p-1 text-center">{v.stock}</td>
+                    <td className="p-1 text-center">{v.ventas}</td>
+                    <td className="p-1 text-center">{v.rotacionSemanal.toFixed(2)}</td>
+                    <td className="p-1 text-center">
+                      {v.ultimaVenta ? format(new Date(v.ultimaVenta), 'dd/MM/yyyy') : '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <DialogFooter>
+              <Button onClick={() => setModalAbierto(false)}>Cerrar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   )

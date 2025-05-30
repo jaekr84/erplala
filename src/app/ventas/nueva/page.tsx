@@ -37,13 +37,13 @@ export default function NuevaVentaPage() {
     const [codigoBarra, setCodigoBarra] = useState('')
     const [resultados, setResultados] = useState<VarianteConProducto[]>([])
     const [detalle, setDetalle] = useState<any[]>([])
-    const [descuentoPorc, setDescuentoPorc] = useState(0)
+    const [descuentoPorc, setDescuentoPorc] = useState<number | ''>('')
     const [descuentoManual, setDescuentoManual] = useState('')
     const [medioPago1, setMedioPago1] = useState('')
     const [medioPago2, setMedioPago2] = useState('')
-    const [montoPago1, setMontoPago1] = useState(0)
-    const [montoPago2, setMontoPago2] = useState(0)
-    const [pagoCliente, setPagoCliente] = useState(0)
+    const [montoPago1, setMontoPago1] = useState<number | ''>('')
+    const [montoPago2, setMontoPago2] = useState<number | ''>('')
+    const [pagoCliente, setPagoCliente] = useState<number | ''>('')
     const [mediosPago, setMediosPago] = useState<MedioPago[]>([])
     const [modalCliente, setModalCliente] = useState(false)
     const [cargando, setCargando] = useState(true)
@@ -171,9 +171,9 @@ export default function NuevaVentaPage() {
     const unidades = detalle.reduce((sum, item) => sum + item.cantidad, 0)
     const descuentoCalculado = descuentoManual
         ? Number(descuentoManual)
-        : Math.ceil((subtotal * (descuentoPorc / 100)) / 1000) * 1000
+        : Math.ceil((subtotal * (Number(descuentoPorc) / 100)) / 1000) * 1000
     const total = subtotal - descuentoCalculado
-    const vuelto = pagoCliente - total
+    const vuelto = Number(pagoCliente) - total
 
     useEffect(() => {
         setMontoPago1(total)
@@ -201,10 +201,14 @@ export default function NuevaVentaPage() {
     }
 
 
-    const handleMontoPago1Change = (valor: number) => {
+    const handleMontoPago1Change = (valor: number | '') => {
         setMontoPago1(valor)
-        const restante = total - valor
-        if (restante > 0) {
+        const v = Number(valor)
+        const restante = total - v
+        if (v === 0 || valor === '') {
+            setMontoPago2(0)
+            setMedioPago2('')
+        } else if (restante > 0) {
             setMontoPago2(restante)
         } else {
             setMontoPago2(0)
@@ -216,7 +220,7 @@ export default function NuevaVentaPage() {
         if (detalle.length === 0) return alert('Debe agregar al menos un producto')
         if (!medioPago1 && !medioPago2) return alert('Debe seleccionar al menos un medio de pago')
 
-        const montoTotalPagado = montoPago1 + montoPago2
+        const montoTotalPagado = Number(montoPago1) + Number(montoPago2)
         if (montoTotalPagado < total) return alert('El total abonado no cubre el total de la venta')
 
         const payload = {
@@ -231,8 +235,8 @@ export default function NuevaVentaPage() {
             descuento: descuentoCalculado,
             total,
             pagos: [
-                ...(medioPago1 && montoPago1 ? [{ medioPagoId: Number(medioPago1), monto: montoPago1 }] : []),
-                ...(medioPago2 && montoPago2 ? [{ medioPagoId: Number(medioPago2), monto: montoPago2 }] : [])
+                ...(medioPago1 && montoPago1 ? [{ medioPagoId: Number(medioPago1), monto: Number(montoPago1) }] : []),
+                ...(medioPago2 && montoPago2 ? [{ medioPagoId: Number(medioPago2), monto: Number(montoPago2) }] : [])
             ]
         }
 
@@ -447,7 +451,8 @@ export default function NuevaVentaPage() {
                         type="number"
                         value={descuentoPorc}
                         onChange={e => {
-                            setDescuentoPorc(Number(e.target.value))
+                            const val = e.target.value
+                            setDescuentoPorc(val === '' ? '' : Number(val))
                             setDescuentoManual('') // Limpiar el otro
                         }}
                         disabled={!!descuentoManual}
@@ -482,7 +487,12 @@ export default function NuevaVentaPage() {
             <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
                 <div>
                     <label className="text-xs">Pago cliente</label>
-                    <Input className='bg-white' type="number" value={pagoCliente} onChange={e => setPagoCliente(Number(e.target.value))} />
+                    <Input
+                        className='bg-white'
+                        type="number"
+                        value={pagoCliente}
+                        onChange={e => setPagoCliente(e.target.value === '' ? '' : Number(e.target.value))}
+                    />
                 </div>
                 <div>
                     <label className="text-xs">Vuelto</label>
@@ -507,7 +517,7 @@ export default function NuevaVentaPage() {
                     <Input
                         type="number"
                         value={montoPago1}
-                        onChange={e => handleMontoPago1Change(Number(e.target.value))}
+                        onChange={e => handleMontoPago1Change(e.target.value === '' ? '' : Number(e.target.value))}
                         className="mt-1 bg-white"
                     />
                 </div>
