@@ -48,9 +48,9 @@ export default function ModalDetalleVenta({ venta, onClose }: Props) {
 
     const fecha = new Date()
     const fechaStr = fecha.toISOString().slice(0, 10)
-    const nro = venta.nroComprobante.toString().padStart(7, '0')
+    const nro = venta.nroComprobante
 
-    const resVenta = await fetch(`/api/tickets/venta/${venta.id}/txt`)
+    const resVenta = await fetch(`/api/tickets/venta/${venta.nroComprobante}/txt`)
     const contenidoVenta = await resVenta.text()
 
     let contenidoCambio = ''

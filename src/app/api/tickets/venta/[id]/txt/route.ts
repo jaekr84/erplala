@@ -1,11 +1,18 @@
 import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/db'
 
-export async function GET(_: NextRequest, context: any) {
-  const id = Number(context.params.id)
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const nroComprobante = context.params.id
+  console.log("🔍 Buscando comprobante:", nroComprobante)
+  if (!nroComprobante) {
+    return new NextResponse("ERROR: nroComprobante no recibido", {
+      status: 400,
+      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    })
+  }
 
   const venta = await prisma.venta.findUnique({
-    where: { id },
+    where: { nroComprobante },
     include: {
       cliente: true,
       detalles: {
@@ -23,8 +30,18 @@ export async function GET(_: NextRequest, context: any) {
 
   const negocio = await prisma.datosNegocio.findUnique({ where: { id: 1 } })
 
+  if (!negocio?.nombre || !negocio?.direccion || !negocio?.cuit) {
+    return new NextResponse('ERROR: Datos del negocio incompletos', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    })
+  }
+
   if (!venta || !negocio) {
-    return NextResponse.json({ error: 'Venta no encontrada' }, { status: 404 })
+    return new NextResponse('ERROR: Venta o datos de negocio no encontrados', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    })
   }
 
   // Función para cortar líneas largas a 32 caracteres
@@ -52,7 +69,7 @@ export async function GET(_: NextRequest, context: any) {
   lines.push(`CLIENTE:`)
   lines.push(venta.cliente?.nombre || 'Consumidor Final')
   lines.push(`COMPROBANTE:`)
-  lines.push(`V${venta.nroComprobante.toString().padStart(7, '0')}`)
+lines.push(venta.nroComprobante)
   lines.push('-'.repeat(32))
 
   // DETALLES
@@ -94,4 +111,5 @@ export async function GET(_: NextRequest, context: any) {
       'Content-Disposition': `attachment; filename=ticket_${venta.nroComprobante}.txt`,
     },
   })
+  
 }

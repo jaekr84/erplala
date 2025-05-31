@@ -12,9 +12,18 @@ export async function POST(req: Request) {
     nombreCambio,
   } = await req.json();
 
+  console.log("🧾 ContenidoVenta recibido:\n", contenidoVenta);
+
   if (!emailDestino || !contenidoVenta) {
     return NextResponse.json(
       { error: "Faltan datos obligatorios" },
+      { status: 400 }
+    );
+  }
+
+  if (!contenidoVenta.trim()) {
+    return NextResponse.json(
+      { error: "El contenido del comprobante está vacío" },
       { status: 400 }
     );
   }
@@ -54,12 +63,20 @@ export async function POST(req: Request) {
   };
 
   const pdfVenta = await generarPDF(contenidoVenta, "¡Gracias por tu compra! ");
-  const pdfCambio = contenidoCambio
-    ? await generarPDF(
-        contenidoCambio,
-        "Este ticket es válido solo para cambio."
-      )
-    : null;
+
+  console.log("🧾 ContenidoCambio recibido:\n", contenidoCambio);
+
+  const pdfCambio =
+    contenidoCambio && !contenidoCambio.includes('<html')
+      ? await generarPDF(
+          contenidoCambio,
+          "Este ticket es válido solo para cambio."
+        )
+      : null;
+
+  if (!pdfCambio) {
+    console.warn("⚠️ Ticket de cambio no generado: contenido inválido o malformado.");
+  }
 
   const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,

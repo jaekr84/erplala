@@ -1,20 +1,25 @@
-import { NextResponse } from 'next/server'
-import { NextRequest } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/db'
 
-export async function GET(_: NextRequest, context: any) {
-  const id = Number(context.params.id)
+export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const nroComprobante = context.params?.id
+  console.log("📦 Comprobante recibido en ticket de cambio:", nroComprobante)
+  console.log("🔍 Buscando comprobante:", nroComprobante)
+  if (!nroComprobante) {
+    return new NextResponse("ERROR: nroComprobante no recibido", {
+      status: 400,
+      headers: { "Content-Type": "text/plain; charset=utf-8" }
+    })
+  }
 
   const venta = await prisma.venta.findUnique({
-    where: { id },
+    where: { nroComprobante },
     include: {
       cliente: true,
       detalles: {
         include: {
           variante: {
-            include: {
-              producto: true
-            }
+            include: { producto: true }
           }
         }
       }
@@ -23,20 +28,42 @@ export async function GET(_: NextRequest, context: any) {
 
   const negocio = await prisma.datosNegocio.findUnique({ where: { id: 1 } })
 
+  if (!venta) console.error("❌ Venta no encontrada con nroComprobante:", nroComprobante)
+  if (!negocio) console.error("❌ Datos de negocio no encontrados")
+
+  if (!negocio?.nombre || !negocio?.direccion || !negocio?.cuit) {
+    return new NextResponse('ERROR: Datos del negocio incompletos', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    })
+  }
+
   if (!venta || !negocio) {
-    return NextResponse.json({ error: 'Venta o datos de negocio no encontrados' }, { status: 404 })
+    return new NextResponse('ERROR: Venta o datos de negocio no encontrados', {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    })
+  }
+
+  const cortar = (texto: string, largo = 32): string[] => {
+    const resultado = []
+    for (let i = 0; i < texto.length; i += largo) {
+      resultado.push(texto.slice(i, i + largo))
+    }
+    return resultado
   }
 
   const lines: string[] = []
 
   // ENCABEZADO
-  lines.push(negocio.nombre)
-  lines.push(negocio.direccion)
+  cortar(negocio.nombre).forEach(line => lines.push(line))
+  cortar(negocio.direccion).forEach(line => lines.push(line))
   lines.push(`CUIT: ${negocio.cuit}`)
-  lines.push('------------------------')
+  lines.push('='.repeat(32))
   lines.push('TICKET DE CAMBIO')
-  lines.push('------------------------')
+  lines.push('='.repeat(32))
 
+  // FECHA + CLIENTE + COMPROBANTE
   const fecha = new Date(venta.fecha)
   lines.push(`FECHA:`)
   lines.push(`${fecha.getDate().toString().padStart(2, '0')}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getFullYear()}`)
@@ -44,27 +71,27 @@ export async function GET(_: NextRequest, context: any) {
   lines.push(`CLIENTE:`)
   lines.push(venta.cliente?.nombre || 'Consumidor Final')
   lines.push(`COMPROBANTE:`)
-  lines.push(`V${venta.nroComprobante.toString().padStart(7, '0')}`)
-  lines.push('------------------------')
+  lines.push(venta.nroComprobante)
+  lines.push('-'.repeat(32))
 
-  // DETALLES SIN PRECIOS
-  venta.detalles.forEach((item) => {
-    if (item.paraCambio) {
-      const desc = item.variante.producto.descripcion
-      const talle = item.variante.talle
-      const color = item.variante.color
-      lines.push(`${desc}`)
-      lines.push(`- ${talle} ${color}`)
-      lines.push(`  Cantidad: ${item.cantidad}`)
-      lines.push('------------------------')
-    }
-  })
+  const itemsCambio = venta.detalles.filter(i => i.paraCambio)
+
+  if (itemsCambio.length === 0) {
+    lines.push('No hay productos marcados para cambio.')
+  } else {
+    itemsCambio.forEach((item) => {
+      cortar(item.variante.producto.descripcion).forEach(line => lines.push(line))
+      lines.push(`- ${item.variante.talle} ${item.variante.color}`)
+      lines.push(`Cantidad: ${item.cantidad}`)
+      lines.push('-'.repeat(32))
+    })
+  }
 
   lines.push('Este ticket es válido solo para cambio.')
 
   if (negocio.pieTicket) {
-    lines.push('------------------------')
-    negocio.pieTicket.split('\n').forEach(line => lines.push(line))
+    lines.push('='.repeat(32))
+    cortar(negocio.pieTicket).forEach(line => lines.push(line))
   }
 
   const contenido = lines.join('\n')
@@ -73,7 +100,7 @@ export async function GET(_: NextRequest, context: any) {
     status: 200,
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
-      'Content-Disposition': `attachment; filename=ticket_cambio_${id}.txt`,
+      'Content-Disposition': `attachment; filename="ticket_cambio_${venta.nroComprobante}.txt"`,
     },
   })
 }

@@ -71,7 +71,8 @@ export default function NuevaVentaPage() {
             return
         }
 
-        const resTxt = await fetch(`/api/tickets/venta/${ventaConfirmada.id}/txt`)
+        // Usar nroComprobante en lugar de id
+        const resTxt = await fetch(`/api/tickets/venta/${ventaConfirmada.nroComprobante}/txt`)
         const texto = await resTxt.text()
 
         const res = await fetch('/api/enviar-comprobante', {
@@ -80,7 +81,7 @@ export default function NuevaVentaPage() {
             body: JSON.stringify({
                 emailDestino: clienteEmail || 'test@cliente.com',
                 contenido: texto,
-                nombreAdjunto: `comprobante_${ventaConfirmada.id}.txt`
+                nombreAdjunto: `comprobante_${ventaConfirmada.nroComprobante}.txt`
             })
         })
 
@@ -580,18 +581,16 @@ export default function NuevaVentaPage() {
                                 // Fecha y comprobante para nombre
                                 const fecha = new Date()
                                 const fechaStr = fecha.toISOString().slice(0, 10)
-                                const nroStr = `V${ventaConfirmada.nroComprobante
-                                    ?.toString()
-                                    .padStart(7, '0') || ventaConfirmada.id}`
+                                const nroStr = ventaConfirmada.nroComprobante
 
                                 // Buscar contenido del comprobante de venta
-                                const resVenta = await fetch(`/api/tickets/venta/${ventaConfirmada.id}/txt`)
+                                const resVenta = await fetch(`/api/tickets/venta/${ventaConfirmada.nroComprobante}/txt`)
                                 const contenidoVenta = await resVenta.text()
 
                                 let contenidoCambio = ''
                                 const hayCambio = detalle.some(item => item.paraCambio)
                                 if (hayCambio) {
-                                    const resCambio = await fetch(`/api/tickets/cambio/${ventaConfirmada.id}/txt`)
+                                    const resCambio = await fetch(`/api/tickets/cambio/${ventaConfirmada.nroComprobante}/txt`)
                                     contenidoCambio = await resCambio.text()
                                 }
 
