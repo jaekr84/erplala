@@ -56,7 +56,7 @@ export async function POST(req: Request) {
       const nuevaVenta = await tx.venta.create({
         data: {
           nroComprobante,
-          fecha: new Date(), // ✅ Usa la fecha y hora actual
+          fecha: new Date(fecha), // ✅ Usa la fecha y hora actual
           clienteId: clienteId || null,
           subtotal,
           descuento,

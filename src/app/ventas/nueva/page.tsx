@@ -1,7 +1,8 @@
 // NuevaVentaPage.tsx corregido y ordenado
+// NuevaVentaPage.tsx corregido y ordenado
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import { VarianteConProducto, MedioPago, Cliente } from '@/types'
@@ -28,14 +29,14 @@ const formatCurrency = (v: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v)
 
 export default function NuevaVentaPage() {
+    // Referencia para el área de búsqueda y sugerencias
+    const contenedorBusquedaRef = useRef<HTMLDivElement>(null)
     const router = useRouter()
     const [fecha, setFecha] = useState('')
     const [nroComprobante, setNroComprobante] = useState('')
     const [clientes, setClientes] = useState<Cliente[]>([])
     const [clienteId, setClienteId] = useState(1)
-    const [busqueda, setBusqueda] = useState('')
-    const [codigoBarra, setCodigoBarra] = useState('')
-    const [resultados, setResultados] = useState<VarianteConProducto[]>([])
+    // Eliminados: busqueda, codigoBarra, resultados
     const [detalle, setDetalle] = useState<any[]>([])
     const [descuentoPorc, setDescuentoPorc] = useState<number | ''>('')
     const [descuentoManual, setDescuentoManual] = useState('')
@@ -95,20 +96,34 @@ export default function NuevaVentaPage() {
         }
     }
     useEffect(() => {
-        const fetchData = async () => {
-            if (query.trim().length < 2) return setSugerencias([])
+        if (query.trim().length < 2) return setSugerencias([])
 
+        const fetchData = async () => {
             const res = await fetch(`/api/variantes/buscar?query=${encodeURIComponent(query)}`)
             if (!res.ok) return
 
             const data = await res.json()
-            setSugerencias(data)
 
-            // Autocompletar si hay una sola coincidencia
-            if (data.length === 1) {
-                agregarAlDetalle(data[0])
+            // Si hay una sola coincidencia o match exacto por código de barras, agregar directamente
+            if (
+                data.length === 1 ||
+                data.some((v: VarianteConProducto) =>
+                    v.codBarra === query ||
+                    v.producto.codigo === query ||
+                    v.producto.descripcion === query
+                )
+            ) {
+                const exacto =
+                    data.find((v: VarianteConProducto) =>
+                        v.codBarra === query ||
+                        v.producto.codigo === query ||
+                        v.producto.descripcion === query
+                    ) || data[0]
+                agregarAlDetalle(exacto)
                 setQuery('')
                 setSugerencias([])
+            } else {
+                setSugerencias(data)
             }
         }
 
@@ -116,19 +131,40 @@ export default function NuevaVentaPage() {
         return () => clearTimeout(delay)
     }, [query])
 
+    // Cerrar sugerencias al hacer clic fuera del área de búsqueda y dropdown
     useEffect(() => {
-        fetch('/api/caja/estado')
-            .then(res => res.json())
-            .then(data => {
-                const hoy = new Date().toISOString().split("T")[0]
-                const fechaCaja = data?.fechaApertura?.split("T")[0]
-                setCajaActiva(data?.estado === 'ABIERTA' && fechaCaja === hoy)
-                setCargando(false)
-            })
-            .catch(() => {
-                setCajaActiva(false)
-                setCargando(false)
-            })
+      const manejarClickFuera = (e: MouseEvent) => {
+        if (
+          contenedorBusquedaRef.current &&
+          !contenedorBusquedaRef.current.contains(e.target as Node)
+        ) {
+          setSugerencias([])
+          setQuery('')
+        }
+      }
+      document.addEventListener('mousedown', manejarClickFuera)
+      return () => document.removeEventListener('mousedown', manejarClickFuera)
+    }, [])
+
+    useEffect(() => {
+      fetch('/api/caja/abierta')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.abierta) {
+            router.push('/caja?volver=/ventas/nueva')
+            return
+          }
+          if (data.requiereCierre) {
+            router.push('/caja/cierre')
+            return
+          }
+          setCajaActiva(true)
+          setCargando(false)
+        })
+        .catch(() => {
+          setCajaActiva(false)
+          setCargando(false)
+        })
     }, [])
 
     useEffect(() => {
@@ -144,28 +180,7 @@ export default function NuevaVentaPage() {
             .then(data => setClientes(data))
     }, [])
 
-    useEffect(() => {
-    if (busqueda.trim().length < 2) return setResultados([])
-    const delay = setTimeout(() => {
-        fetch(`/api/variantes/buscar?query=${encodeURIComponent(busqueda)}`)
-            .then(res => res.json())
-            .then(data => setResultados(data))
-    }, 300)
-    return () => clearTimeout(delay)
-}, [busqueda])
-
-    useEffect(() => {
-        if (codigoBarra.trim().length < 3) return
-        const delay = setTimeout(() => {
-            fetch(`/api/variantes/cod-barra/${encodeURIComponent(codigoBarra)}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data?.id) agregarAlDetalle(data)
-                    setCodigoBarra('')
-                })
-        }, 300)
-        return () => clearTimeout(delay)
-    }, [codigoBarra])
+    // Eliminados useEffect de busqueda y codigoBarra
 
 
     // --- Totales y descuentos (declarar antes del useEffect que los necesita) ---
@@ -304,11 +319,11 @@ export default function NuevaVentaPage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 {/* Input de búsqueda + dropdown */}
-                <div className="relative">
+                <div className="relative" ref={contenedorBusquedaRef}>
                     <Input
-                        placeholder="Buscar por código o descripción"
+                        placeholder="Buscar por código, descripción o escanear"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         className="bg-white"
@@ -316,7 +331,7 @@ export default function NuevaVentaPage() {
 
                     {sugerencias.length > 0 && (
                         <div className="absolute z-50 w-full bg-white border rounded shadow max-h-64 overflow-y-auto mt-1">
-                            {sugerencias.map(v => (
+                            {sugerencias.map((v: VarianteConProducto) => (
                                 <div
                                     key={v.id}
                                     className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
@@ -326,42 +341,16 @@ export default function NuevaVentaPage() {
                                         setSugerencias([])
                                     }}
                                 >
-                                    <div className="font-medium">{v.producto.descripcion}</div>
-                                    <div className="text-xs text-gray-500">
-                                        Código: {v.producto.codigo} — Talle: {v.talle} — Color: {v.color}
+                                    <div className="text-sm text-gray-700">
+                                        {v.producto.descripcion} — {v.producto.codigo} — T:{v.talle} — C:{v.color}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
-
-                {/* Input de código de barras */}
-                <Input
-                    placeholder="Escanear código de barras"
-                    value={codigoBarra}
-                    onChange={e => setCodigoBarra(e.target.value)}
-                    className="bg-white"
-                />
             </div>
-            {/* Resultados */}
-            {resultados.length > 0 && (
-                <ul className="border rounded shadow bg-white text-sm max-h-48 overflow-auto divide-y mt-1">
-                    {resultados.map(v => (
-                        <li
-                            key={v.id}
-                            className="px-3 py-2 hover:bg-blue-100 cursor-pointer"
-                            onClick={() => {
-                                agregarAlDetalle(v)
-                                setBusqueda('')
-                                setResultados([])
-                            }}
-                        >
-                            {v.producto.codigo} - {v.producto.descripcion} T:{v.talle} C:{v.color} (${v.producto.precioVenta})
-                        </li>
-                    ))}
-                </ul>
-            )}
+            {/* Eliminado el input de código de barras y resultados de búsqueda */}
 
             <div className="border rounded h-64 overflow-y-auto text-sm bg-white dark:bg-zinc-900">
                 <table className="w-full text-left">
