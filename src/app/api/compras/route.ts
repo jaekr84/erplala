@@ -68,7 +68,7 @@ export async function POST(req: Request) {
             tipo: "COMPRA",
             cantidad: Number(v.cantidad),
             comprobante: nroComprobante,
-            costo: Number(v.costo), // ✅ agregado para registrar en el Kardex
+            costo: Number(v.costo),
             observacion: "Compra",
             fecha,
           },
@@ -88,29 +88,53 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
-  const compras = await prisma.compra.findMany({
-    include: {
-      proveedor: true,
-      detalles: {
-        include: {
-          variante: {
-            include: {
-              producto: {
-                select: {
-                  descripcion: true,
-                  codigo: true,
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const desde = searchParams.get("desde");
+  const hasta = searchParams.get("hasta");
+  const comprobante = searchParams.get("comprobante")?.toLowerCase() || '';
+
+  const fechaHastaFinal = hasta ? new Date(hasta) : undefined;
+
+  try {
+    const compras = await prisma.compra.findMany({
+      where: {
+        fecha: {
+          ...(desde && { gte: new Date(desde) }),
+          ...(fechaHastaFinal && { lte: new Date(fechaHastaFinal.getTime() + 86400000) }),
+        },
+        ...(comprobante && {
+          nroComprobante: {
+            contains: comprobante,
+            mode: 'insensitive',
+          },
+        }),
+      },
+      include: {
+        proveedor: true,
+        detalles: {
+          include: {
+            variante: {
+              include: {
+                producto: {
+                  select: {
+                    descripcion: true,
+                    codigo: true,
+                  },
                 },
               },
             },
           },
         },
       },
-    },
-    orderBy: {
-      fecha: "desc",
-    },
-  });
+      orderBy: {
+        fecha: 'desc',
+      },
+    });
 
-  return NextResponse.json(compras);
+    return NextResponse.json(compras);
+  } catch (error) {
+    console.error('❌ Error en GET /api/compras', error);
+    return NextResponse.json({ message: 'Error al obtener las compras' }, { status: 500 });
+  }
 }
