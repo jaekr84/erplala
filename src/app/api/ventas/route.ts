@@ -119,6 +119,7 @@ export async function GET(req: Request) {
   const busqueda = searchParams.get("busqueda") || "";
   const pagina = parseInt(searchParams.get("pagina") || "1");
   const porPagina = 25;
+  const orden = searchParams.get("orden");
 
   if (!desde || !hasta) {
     return NextResponse.json({ message: "Faltan fechas" }, { status: 400 });
@@ -157,7 +158,9 @@ export async function GET(req: Request) {
             },
           },
         },
-        orderBy: { fecha: "desc" },
+        orderBy: orden === 'nroComprobante-asc'
+          ? { nroComprobante: 'asc' }
+          : { nroComprobante: 'desc' },
         skip: (pagina - 1) * porPagina,
         take: porPagina,
       }),

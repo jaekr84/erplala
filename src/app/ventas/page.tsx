@@ -20,7 +20,7 @@ export default function VentasPage() {
   useEffect(() => {
     const fetchVentas = async () => {
       const params = new URLSearchParams({ desde, hasta, busqueda, pagina: pagina.toString() })
-      const res = await fetch(`/api/ventas?${params.toString()}`)
+      const res = await fetch(`/api/ventas?${params.toString()}&orden=nroComprobante-desc`)
       if (!res.ok) return alert('Error al cargar ventas')
       const data = await res.json()
       setVentas(data.ventas)
