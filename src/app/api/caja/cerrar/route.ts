@@ -6,7 +6,14 @@ const hoy = ahora.toISOString().split("T")[0];
 
 export async function POST(req: Request) {
   try {
-    const { id, totalReal, observaciones } = await req.json();
+    const { id, totalReal, observaciones, forzar } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Falta el ID de la caja para cerrar." },
+        { status: 400 }
+      );
+    }
 
     const caja = await prisma.caja.findUnique({ where: { id } });
 
@@ -17,7 +24,7 @@ export async function POST(req: Request) {
       );
 
     const fechaCaja = caja.fechaApertura.toISOString().split("T")[0];
-    if (fechaCaja !== hoy) {
+    if (fechaCaja !== hoy && !forzar) {
       return NextResponse.json(
         { error: "No podés cerrar una caja de días anteriores." },
         { status: 400 }

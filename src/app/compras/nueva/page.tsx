@@ -9,6 +9,13 @@ import ModalCrearArticulo from '@/components/ModalCrearArticulo'
 import ModalProveedor from '@/components/ModalProveedor'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 
 
@@ -31,6 +38,7 @@ export default function NuevaCompraPage() {
   const [totalBruto, setTotalBruto] = useState(0)
   const [totalNeto, setTotalNeto] = useState(0)
   const [modalCrearArticulo, setModalCrearArticulo] = useState(false)
+  const [modalConfirmacion, setModalConfirmacion] = useState(false)
 
   useEffect(() => {
     setFecha(new Date().toISOString().split('T')[0]) // Formato YYYY-MM-DD
@@ -50,11 +58,18 @@ export default function NuevaCompraPage() {
       })
   }, [])
 
-  useEffect(() => {
-    fetch('/api/proveedores?query=' + proveedorBusqueda)
+useEffect(() => {
+  const delayDebounce = setTimeout(() => {
+    if (proveedorBusqueda.length < 2 || proveedor) return
+
+    fetch('/api/proveedores?query=' + encodeURIComponent(proveedorBusqueda))
       .then(res => res.json())
       .then(data => setProveedores(data))
-  }, [proveedorBusqueda])
+      .catch(err => console.error('Error al buscar proveedores:', err))
+  }, 300)
+
+  return () => clearTimeout(delayDebounce)
+}, [proveedorBusqueda, proveedor])
 
   useEffect(() => {
     if (articuloBusqueda.length < 2) return
@@ -109,8 +124,7 @@ export default function NuevaCompraPage() {
       })
     })
     if (res.ok) {
-      alert('Compra registrada correctamente')
-      window.location.href = '/compras'
+      setModalConfirmacion(true)
     } else {
       alert('Error al registrar la compra')
     }
@@ -159,6 +173,7 @@ export default function NuevaCompraPage() {
                   className="p-2 hover:bg-blue-100 cursor-pointer"
                   onClick={() => {
                     setProveedor(p)
+                    setProveedorBusqueda(p.nombre)
                     setProveedores([])
                   }}
                 >
@@ -318,7 +333,11 @@ export default function NuevaCompraPage() {
       </div>
 
       <div className="flex justify-between pt-6">
-        <Button variant="default" className="bg-black hover:bg-gray-800 text-white">
+        <Button
+          variant="default"
+          className="bg-black hover:bg-gray-800 text-white"
+          onClick={handleConfirmar}
+        >
           Confirmar compra
         </Button>
       </div>
@@ -343,6 +362,27 @@ export default function NuevaCompraPage() {
           }}
         />
       )}
+
+      <Dialog open={modalConfirmacion} onOpenChange={setModalConfirmacion}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-green-600">✅ Compra registrada</DialogTitle>
+          </DialogHeader>
+          <div className="text-sm text-gray-600">
+            La compra fue registrada correctamente.
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setModalConfirmacion(false)
+                window.location.href = '/compras'
+              }}
+            >
+              Aceptar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -73,8 +73,10 @@ export default function CajaPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        id: caja?.id,
         totalReal: parseFloat(totalReal),
         observaciones,
+        //forzar: true,//  es para forzar el cierre de caja
       }),
     })
 
