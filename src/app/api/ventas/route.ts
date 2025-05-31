@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   }
   try {
     const data = await req.json();
-    const { clienteId, fecha, detalle, descuento, total, pagos } = data;
+    const { clienteId, fecha, detalle, descuento, total, pagos, emailEnviadoA } = data;
 
     if (!detalle || detalle.length === 0 || !pagos || pagos.length === 0) {
       return NextResponse.json(
@@ -57,10 +57,11 @@ export async function POST(req: Request) {
         data: {
           nroComprobante,
           fecha: new Date(fecha), // ✅ Usa la fecha y hora actual
-          clienteId: clienteId || null,
+          cliente: !clienteId || clienteId === 1 ? undefined : { connect: { id: clienteId } },
           subtotal,
           descuento,
           total,
+          emailEnviadoA: emailEnviadoA || null,
           detalles: {
             create: detalle.map((d: any) => ({
               varianteId: d.varianteId,

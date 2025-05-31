@@ -98,6 +98,9 @@ export default function ModalDetalleVenta({ venta, onClose }: Props) {
           <p><strong>Fecha:</strong> {new Date(venta.fecha).toLocaleDateString()}</p>
           <p><strong>Cliente:</strong> {venta.cliente?.nombre || 'Consumidor final'}</p>
           <p><strong>Total:</strong> ${venta.total.toLocaleString('es-AR')}</p>
+          {venta.emailEnviadoA && (
+            <p><strong>Email enviado:</strong> {venta.emailEnviadoA}</p>
+          )}
         </div>
 
         <div className="mt-4 overflow-auto">

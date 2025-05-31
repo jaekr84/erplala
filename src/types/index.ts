@@ -121,4 +121,5 @@ export type VentaConDetalles = {
       }
     }
   }[]
+  emailEnviadoA?: string | null
 }

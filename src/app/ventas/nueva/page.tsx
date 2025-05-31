@@ -177,7 +177,13 @@ export default function NuevaVentaPage() {
             .then(data => setMediosPago(data))
         fetch('/api/clientes')
             .then(res => res.json())
-            .then(data => setClientes(data))
+            .then(data => {
+                setClientes(data)
+                const cliente = data.find((c: Cliente) => c.id === clienteId)
+                if (cliente?.email) {
+                  setClienteEmail(cliente.email)
+                }
+            })
     }, [])
 
     // Eliminados useEffect de busqueda y codigoBarra
@@ -301,7 +307,16 @@ export default function NuevaVentaPage() {
                 </div>
                 <div className="md:col-span-2">
                     <label className="text-xs text-muted-foreground">Cliente</label>
-                    <Select value={String(clienteId)} onValueChange={v => setClienteId(Number(v))}>
+                    <Select
+                      value={String(clienteId)}
+                      onValueChange={v => {
+                        const id = Number(v)
+                        setClienteId(id)
+                        const cliente = clientes.find(c => c.id === id)
+                        if (cliente?.email) setClienteEmail(cliente.email)
+                        else setClienteEmail('')
+                      }}
+                    >
                         <SelectTrigger className='bg-white'>
                             <SelectValue placeholder="Seleccionar cliente" />
                         </SelectTrigger>
@@ -619,14 +634,8 @@ export default function NuevaVentaPage() {
                                 })
 
                                 if (res.ok) {
-                                    toast('📧 Enviado correctamente', {
-                                      description: 'El comprobante fue enviado al cliente.',
-                                      position: 'top-center',
-                                      action: {
-                                        label: 'Cerrar',
-                                        onClick: () => router.push('/ventas/nueva')
-                                      },
-                                    })
+                                    setModalAbierto(false)
+                                    setShowModal(true)
                                 } else {
                                     toast.error('❌ Error al enviar', {
                                         description: 'No se pudo enviar el comprobante. Reintentá más tarde.'
@@ -654,6 +663,20 @@ export default function NuevaVentaPage() {
                     setClienteId(data.at(-1).id)
                 }}
             />
-        </div>
-    )
+        {/* Dialog de confirmación de envío */}
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle className="text-green-600">✅ Comprobante enviado</DialogTitle>
+            </DialogHeader>
+            <div className="text-sm text-gray-600 mb-4">
+              El comprobante fue enviado correctamente al cliente.
+            </div>
+            <DialogFooter>
+              <Button onClick={() => router.push('/')}>OK</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+    </div>
+  )
 }

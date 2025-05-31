@@ -13,18 +13,18 @@ model Proveedor {
   telefono  String?
   email     String?
   direccion String?
-  productos Producto[]
-  compras   Compra[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  compras   Compra[]
+  productos Producto[]
 }
 
 model Categoria {
   id        Int        @id @default(autoincrement())
   nombre    String     @unique
-  productos Producto[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+  productos Producto[]
 }
 
 model Producto {
@@ -32,15 +32,15 @@ model Producto {
   codigo      String     @unique
   descripcion String
   costo       Float
-  margen      Float
   precioVenta Float
   proveedorId Int
   categoriaId Int
-  proveedor   Proveedor  @relation(fields: [proveedorId], references: [id])
-  categoria   Categoria  @relation(fields: [categoriaId], references: [id])
-  variantes   Variante[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+  margen      Float
+  categoria   Categoria  @relation(fields: [categoriaId], references: [id])
+  proveedor   Proveedor  @relation(fields: [proveedorId], references: [id])
+  variantes   Variante[]
 }
 
 model Variante {
@@ -50,9 +50,9 @@ model Variante {
   color        String
   stock        Int               @default(0)
   codBarra     String            @unique
-  producto     Producto          @relation(fields: [productoId], references: [id])
   detalles     DetalleCompra[]
   movimientos  MovimientoStock[]
+  producto     Producto          @relation(fields: [productoId], references: [id])
   VentaDetalle VentaDetalle[]
 }
 
@@ -63,49 +63,40 @@ model Contador {
   updatedAt DateTime @updatedAt
 }
 
-enum TipoMovimiento {
-  INGRESO
-  EGRESO
-  AJUSTE
-  CAMBIO
-  COMPRA
-  VENTA
-}
-
 model MovimientoStock {
   id          Int            @id @default(autoincrement())
+  varianteId  Int
   fecha       DateTime       @default(now())
   tipo        TipoMovimiento
   cantidad    Int
   comprobante String
-  costo       Float?
   observacion String?
-  varianteId  Int
-  variante    Variante       @relation(fields: [varianteId], references: [id])
   usuarioId   Int?
+  costo       Float?
+  variante    Variante       @relation(fields: [varianteId], references: [id])
 }
 
 model Compra {
   id             Int             @id @default(autoincrement())
-  nroComprobante String          @unique @default("TEMP")
-  proveedor      Proveedor       @relation(fields: [proveedorId], references: [id])
   proveedorId    Int
   fecha          DateTime        @default(now())
   total          Float
-  detalles       DetalleCompra[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+  nroComprobante String          @unique @default("TEMP")
+  proveedor      Proveedor       @relation(fields: [proveedorId], references: [id])
+  detalles       DetalleCompra[]
 }
 
 model DetalleCompra {
   id         Int      @id @default(autoincrement())
-  compra     Compra   @relation(fields: [compraId], references: [id])
   compraId   Int
-  variante   Variante @relation(fields: [varianteId], references: [id])
   varianteId Int
   cantidad   Int
   costo      Float
   subtotal   Float    @default(0)
+  compra     Compra   @relation(fields: [compraId], references: [id])
+  variante   Variante @relation(fields: [varianteId], references: [id])
 }
 
 model Cliente {
@@ -118,8 +109,7 @@ model Cliente {
   fechaNac  DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-
-  ventas Venta[]
+  ventas    Venta[]
 }
 
 model Venta {
@@ -129,23 +119,24 @@ model Venta {
   subtotal       Float
   descuento      Float            @default(0)
   total          Float
-  cliente        Cliente?         @relation(fields: [clienteId], references: [id])
   clienteId      Int?
-  detalles       VentaDetalle[]
-  pagos          VentaMedioPago[]
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+  emailEnviadoA  String?
+  cliente        Cliente?         @relation(fields: [clienteId], references: [id])
+  detalles       VentaDetalle[]
+  pagos          VentaMedioPago[]
 }
 
 model VentaDetalle {
   id         Int      @id @default(autoincrement())
-  venta      Venta    @relation(fields: [ventaId], references: [id])
   ventaId    Int
-  variante   Variante @relation(fields: [varianteId], references: [id])
   varianteId Int
   cantidad   Int
   precio     Float
-  paraCambio Boolean @default(false)
+  paraCambio Boolean  @default(false)
+  variante   Variante @relation(fields: [varianteId], references: [id])
+  venta      Venta    @relation(fields: [ventaId], references: [id])
 }
 
 model MedioPago {
@@ -156,11 +147,11 @@ model MedioPago {
 
 model VentaMedioPago {
   id          Int       @id @default(autoincrement())
-  venta       Venta     @relation(fields: [ventaId], references: [id])
   ventaId     Int
-  medioPago   MedioPago @relation(fields: [medioPagoId], references: [id])
   medioPagoId Int
   monto       Float
+  medioPago   MedioPago @relation(fields: [medioPagoId], references: [id])
+  venta       Venta     @relation(fields: [ventaId], references: [id])
 }
 
 model DatosNegocio {
@@ -171,8 +162,9 @@ model DatosNegocio {
   cuit      String
   pieTicket String
 }
+
 model Caja {
-  id            Int         @id @default(autoincrement())
+  id            Int        @id @default(autoincrement())
   fechaApertura DateTime
   fechaCierre   DateTime?
   montoInicial  Float
@@ -182,8 +174,17 @@ model Caja {
   totalReal     Float?
   diferencia    Float?
   observaciones String?
-  estado        EstadoCaja  @default(ABIERTA)
+  estado        EstadoCaja @default(ABIERTA)
   detallesPago  Json?
+}
+
+enum TipoMovimiento {
+  INGRESO
+  EGRESO
+  AJUSTE
+  CAMBIO
+  COMPRA
+  VENTA
 }
 
 enum EstadoCaja {

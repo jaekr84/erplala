@@ -90,16 +90,17 @@ export default function VentasPage() {
                 <td className="p-3">{v.cliente?.nombre || 'Consumidor final'}</td>
                 <td className="p-3">${v.total.toLocaleString('es-AR')}</td>
                 <td className="flex p-3 space-x-2">
-
-                  <Button
-                    variant="link"
-                    size="sm"
-                    className="flex items-center gap-1 text-black-600 hover:text-red-600 [text-decoration:none]"
-                    onClick={() => setVentaSeleccionada(v)}
-                  >
-                    <Eye className="w-4 h-4" />
-                    Ver detalle
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="flex items-center gap-1 text-black-600 hover:text-red-600 [text-decoration:none]"
+                      onClick={() => setVentaSeleccionada(v)}
+                    >
+                      <Eye className="w-4 h-4" />
+                      Ver detalle
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
