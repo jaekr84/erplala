@@ -6,6 +6,8 @@ export async function POST(req: Request) {
 
   const desde = new Date(fechaDesde)
   const hasta = new Date(fechaHasta)
+  // Incluir todo el día en el filtro hasta
+  hasta.setHours(23, 59, 59, 999)
   const dias = Math.ceil((hasta.getTime() - desde.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
   const periodoAnteriorDesde = new Date(desde)
@@ -80,6 +82,25 @@ export async function POST(req: Request) {
   }
   const rankingAnterior = agruparVentas(ventasAnterior)
 
+  const productosConVentasPrevias = await prisma.ventaDetalle.findMany({
+    where: {
+      venta: {
+        fecha: { lt: desde }
+      }
+    },
+    include: {
+      variante: {
+        include: {
+          producto: true
+        }
+      }
+    }
+  })
+
+  const codigosConVentasPrevias = new Set(
+    productosConVentasPrevias.map(v => v.variante.producto.codigo)
+  )
+
   // Mapear productos con todas sus variantes
   const resultado = productos.map(producto => {
     const variantes = producto.variantes.map(v => ({
@@ -113,15 +134,17 @@ export async function POST(req: Request) {
   resultado.forEach((r, i) => {
     r.posicion = i + 1
     const anteriorIndex = rankingAnterior.findIndex(a => a.codigo === r.codigo)
-    let tendencia = '🆕'
-    if (anteriorIndex !== -1) {
-      if (anteriorIndex > i) tendencia = '🔼'
-      else if (anteriorIndex < i) tendencia = '🔽'
-      else tendencia = '➖'
+    if (anteriorIndex === -1) {
+      r.tendencia = codigosConVentasPrevias.has(r.codigo) ? '➖' : '🆕'
+    } else {
+      if (anteriorIndex > i) r.tendencia = '🔼'
+      else if (anteriorIndex < i) r.tendencia = '🔽'
+      else r.tendencia = '➖'
     }
-    r.tendencia = tendencia
     r.anterior = anteriorIndex === -1 ? null : anteriorIndex + 1
   })
 
-  return NextResponse.json(resultado)
+  const resultadoConVentas = resultado.filter(p => p.ventas > 0)
+  const top30 = resultadoConVentas.slice(0, 30)
+  return NextResponse.json(top30)
 }

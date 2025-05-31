@@ -7,6 +7,18 @@ export async function POST(req: Request) {
     where: { estado: "ABIERTA" },
   });
 
+  if (cajaAbierta) {
+    const hoy = new Date().toISOString().split("T")[0];
+    const fechaCaja = cajaAbierta.fechaApertura.toISOString().split("T")[0];
+
+    if (fechaCaja !== hoy) {
+      return NextResponse.json(
+        { error: "Tenés una caja abierta del día anterior. Cerrala antes de continuar." },
+        { status: 400 }
+      );
+    }
+  }
+
   if (!cajaAbierta) {
     return NextResponse.json(
       { error: "No se puede realizar una venta sin una caja abierta" },
@@ -112,7 +124,10 @@ export async function GET(req: Request) {
   }
 
   const fechaDesde = new Date(desde);
+  fechaDesde.setHours(0, 0, 0, 0);
+
   const fechaHasta = new Date(hasta);
+  fechaHasta.setHours(23, 59, 59, 999);
 
   try {
     const [ventas, total] = await Promise.all([

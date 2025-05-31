@@ -120,7 +120,9 @@ export default function NuevaVentaPage() {
         fetch('/api/caja/estado')
             .then(res => res.json())
             .then(data => {
-                setCajaActiva(!!data?.id)
+                const hoy = new Date().toISOString().split("T")[0]
+                const fechaCaja = data?.fechaApertura?.split("T")[0]
+                setCajaActiva(data?.estado === 'ABIERTA' && fechaCaja === hoy)
                 setCargando(false)
             })
             .catch(() => {
