@@ -98,7 +98,7 @@ export default function NuevaVentaPage() {
         const fetchData = async () => {
             if (query.trim().length < 2) return setSugerencias([])
 
-            const res = await fetch(`/api/variantes/buscar?q=${encodeURIComponent(query)}`)
+            const res = await fetch(`/api/variantes/buscar?query=${encodeURIComponent(query)}`)
             if (!res.ok) return
 
             const data = await res.json()
@@ -143,14 +143,14 @@ export default function NuevaVentaPage() {
     }, [])
 
     useEffect(() => {
-        if (busqueda.trim().length < 2) return setResultados([])
-        const delay = setTimeout(() => {
-            fetch(`/api/variantes?query=${encodeURIComponent(busqueda)}`)
-                .then(res => res.json())
-                .then(data => setResultados(data))
-        }, 300)
-        return () => clearTimeout(delay)
-    }, [busqueda])
+    if (busqueda.trim().length < 2) return setResultados([])
+    const delay = setTimeout(() => {
+        fetch(`/api/variantes/buscar?query=${encodeURIComponent(busqueda)}`)
+            .then(res => res.json())
+            .then(data => setResultados(data))
+    }, 300)
+    return () => clearTimeout(delay)
+}, [busqueda])
 
     useEffect(() => {
         if (codigoBarra.trim().length < 3) return
@@ -628,10 +628,14 @@ export default function NuevaVentaPage() {
                                 })
 
                                 if (res.ok) {
-                                    toast.success('📧 Enviado correctamente', {
-                                        description: 'El comprobante fue enviado al cliente.'
+                                    toast('📧 Enviado correctamente', {
+                                      description: 'El comprobante fue enviado al cliente.',
+                                      position: 'top-center',
+                                      action: {
+                                        label: 'Cerrar',
+                                        onClick: () => router.push('/ventas/nueva')
+                                      },
                                     })
-                                    setShowModal(false)
                                 } else {
                                     toast.error('❌ Error al enviar', {
                                         description: 'No se pudo enviar el comprobante. Reintentá más tarde.'
