@@ -23,17 +23,17 @@ export async function POST(req: NextRequest) {
 
     let contador = 0;
     for (const row of registros) {
+      const precio = row["precio"] || row["precio venta"] || "";
+      const codBarra = row["codBarra"] || row["codigo barra"] || "";
       const {
         codigo,
         descripcion,
         proveedor,
         categoria,
         costo,
-        precio,
         talle,
         color,
         stock,
-        codBarra,
       } = row;
       console.log("👉 Fila:", row);
 
