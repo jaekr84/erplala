@@ -20,7 +20,7 @@ type Props = {
 export default function ModalDetalleVenta({ venta, onClose }: Props) {
   const [seleccionados, setSeleccionados] = useState<number[]>([])
   const [showModal, setShowModal] = useState(false)
-  const [clienteEmail, setClienteEmail] = useState('')
+  const [clienteEmail, setClienteEmail] = useState(venta.emailEnviadoA || '')
 
   const toggleProducto = (detalleId: number) => {
     setSeleccionados(prev =>
