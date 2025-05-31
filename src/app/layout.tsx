@@ -89,42 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 )}
               </div>
 
-              {/* Caja */}
-              <div>
-                <Button
-                  variant="ghost"
-                  className="w-full flex justify-between text-xs text-muted-foreground"
-                  onClick={() => toggle(setOpenCaja)}
-                >
-                  <span>Caja</span> {openCaja ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                </Button>
-                {openCaja && (
-                  <div className="ml-2 space-y-1">
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link href="/caja" className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 rounded">
-                        {cajaAbierta === null ? (
-                          <div className="w-4 h-4 bg-gray-300 rounded-full animate-pulse" />
-                        ) : cajaAbierta ? (
-                          <LockKeyholeOpen className="w-4 h-4 text-green-600" />
-                        ) : (
-                          <LockKeyhole className="w-4 h-4 text-red-600" />
-                        )}
-                        <span>Abrir/Cerrar Caja</span>
-                      </Link>
-                    </Button>
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link href="/caja/estado">
-                        <WalletCards size={16} className="mr-2" /> Estado de Caja
-                      </Link>
-                    </Button>
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link href="/caja/historial">
-                        <BookOpenText size={16} className="mr-2" /> Historial de Cajas
-                      </Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
+              
 
               {/* Compras */}
               <div>

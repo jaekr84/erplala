@@ -11,9 +11,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Faltan parámetros" }, { status: 400 });
   }
 
-  const desdeDate = parseISO(desde);
-  const hastaDate = new Date(parseISO(hasta));
-  hastaDate.setHours(23, 59, 59, 999);
+  const desdeDate = new Date(`${desde}T00:00:00`);
+  const hastaDate = new Date(`${hasta}T23:59:59`);
 
   const variantes = await prisma.variante.findMany({
     include: {

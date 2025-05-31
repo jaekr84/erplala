@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
+import { formatFecha } from '@/utils/format'
 import ModalDetalleVenta from 'lala/components/ModalDetalleVenta'
 import { VentaConDetalles } from '@/types'
 import { Input } from "@/components/ui/input"
@@ -11,8 +12,8 @@ import { Printer, Ticket, Eye } from 'lucide-react'
 export default function VentasPage() {
   const [ventas, setVentas] = useState<VentaConDetalles[]>([])
   const [ventaSeleccionada, setVentaSeleccionada] = useState<VentaConDetalles | null>(null)
-  const [desde, setDesde] = useState(format(startOfMonth(new Date()), 'yyyy-MM-dd'))
-  const [hasta, setHasta] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'))
+  const [desde, setDesde] = useState(formatFecha(startOfMonth(new Date()), 'yyyy-MM-dd'))
+  const [hasta, setHasta] = useState(formatFecha(endOfMonth(new Date()), 'yyyy-MM-dd'))
   const [busqueda, setBusqueda] = useState('')
   const [pagina, setPagina] = useState(1)
   const [totalPaginas, setTotalPaginas] = useState(1)
@@ -86,7 +87,7 @@ export default function VentasPage() {
                   className="p-3 font-mono  text-black-600">
                   {v.nroComprobante}
                 </td>
-                <td className="p-3">{new Date(v.fecha).toLocaleDateString()}</td>
+                <td className="p-3">{formatFecha(v.fecha)}</td>
                 <td className="p-3">{v.cliente?.nombre || 'Consumidor final'}</td>
                 <td className="p-3">${v.total.toLocaleString('es-AR')}</td>
                 <td className="flex p-3 space-x-2">

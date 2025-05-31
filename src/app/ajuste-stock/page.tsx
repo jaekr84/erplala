@@ -44,10 +44,14 @@ export default function AjusteStockPage() {
     const ajustes = detalle.filter(d => d.ajuste !== 0)
     if (ajustes.length === 0) return alert('No hay cambios para guardar')
 
+    const hoy = new Date()
+    const fecha = new Date(`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}T00:00:00`)
+
     const payload = ajustes.map(d => ({
       varianteId: d.varianteId,
       stockNuevo: d.stockActual + d.ajuste,
-      diferencia: d.ajuste
+      diferencia: d.ajuste,
+      fecha
     }))
 
     const res = await fetch('/api/ajuste-stock', {

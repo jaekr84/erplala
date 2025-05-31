@@ -199,10 +199,16 @@ export default function ClientesPage() {
             <Button
               onClick={async () => {
                 if (!clienteSeleccionado) return;
+                const clienteFormateado = {
+                  ...clienteSeleccionado,
+                  fechaNac: clienteSeleccionado.fechaNac
+                    ? new Date(clienteSeleccionado.fechaNac).toISOString().slice(0, 10)
+                    : ''
+                }
                 const res = await fetch(`/api/clientes/${clienteSeleccionado.id}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(clienteSeleccionado),
+                  body: JSON.stringify(clienteFormateado),
                 })
                 if (res.ok) {
                   setClientes((prev) =>

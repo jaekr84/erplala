@@ -31,3 +31,27 @@ export async function GET(request: Request) {
 
   return NextResponse.json(variantes)
 }
+export async function POST(req: Request) {
+  const body = await req.json()
+  const { movimientos } = body
+
+  const hoy = new Date()
+  const fecha = new Date(`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}T00:00:00`)
+
+  const registros = await Promise.all(
+    movimientos.map(async (mov: any) => {
+      return await prisma.movimientoStock.create({
+        data: {
+          varianteId: mov.varianteId,
+          tipo: "AJUSTE",
+          cantidad: mov.cantidad,
+          comprobante: mov.comprobante || 'AJUSTE',
+          observacion: mov.observacion || '',
+          fecha,
+        }
+      })
+    })
+  )
+
+  return NextResponse.json({ ok: true, registros })
+}

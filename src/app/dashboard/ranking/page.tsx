@@ -92,7 +92,7 @@ export default function RankingPage() {
                 </td>
                 <td className="p-2">{a.descripcion}</td>
                 <td className="p-2">{a.proveedor || '-'}</td>
-                <td className="p-2">{a.fechaAlta ? new Date(a.fechaAlta).toLocaleDateString() : '-'}</td>
+                <td className="p-2">{a.fechaAlta ? `${new Date(a.fechaAlta).getDate().toString().padStart(2, '0')}-${(new Date(a.fechaAlta).getMonth() + 1).toString().padStart(2, '0')}-${new Date(a.fechaAlta).getFullYear()}` : '-'}</td>
                 <td className="p-2 text-center">{a.ventas}</td>
                 <td className="p-2 text-center">{a.anterior ?? '-'}</td>
                 <td className="p-2 text-center text-xl">{a.tendencia}</td>
@@ -112,7 +112,7 @@ export default function RankingPage() {
             <p><strong>Código:</strong> {detalleArticulo?.codigo}</p>
             <p><strong>Descripción:</strong> {detalleArticulo?.descripcion}</p>
             <p><strong>Proveedor:</strong> {detalleArticulo?.proveedor}</p>
-            <p><strong>Fecha de alta:</strong> {detalleArticulo?.fechaAlta ? new Date(detalleArticulo.fechaAlta).toLocaleDateString() : '-'}</p>
+            <p><strong>Fecha de alta:</strong> {detalleArticulo?.fechaAlta ? `${new Date(detalleArticulo.fechaAlta).getDate().toString().padStart(2, '0')}-${(new Date(detalleArticulo.fechaAlta).getMonth() + 1).toString().padStart(2, '0')}-${new Date(detalleArticulo.fechaAlta).getFullYear()}` : '-'}</p>
           </div>
 
           <table className="w-full text-sm border mt-4">

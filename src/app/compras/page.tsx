@@ -88,7 +88,7 @@ export default function ComprasPage() {
                   >
                     {compra.nroComprobante}
                   </td>
-                  <td className="p-3">{new Date(compra.fecha).toLocaleDateString()}</td>
+                  <td className="p-3">{`${new Date(compra.fecha).getDate().toString().padStart(2, '0')}-${(new Date(compra.fecha).getMonth() + 1).toString().padStart(2, '0')}-${new Date(compra.fecha).getFullYear()}`}</td>
                   <td className="p-3">{compra.proveedor?.nombre}</td>
                   <td className="p-3">{formatCurrency(compra.total)}</td>
                   <td className="p-2 fixed space-x-10 flex justify-right">

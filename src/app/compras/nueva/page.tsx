@@ -109,13 +109,16 @@ useEffect(() => {
       alert('Selecciona un proveedor y al menos una variante')
       return
     }
+    // Convertir la fecha a Date con hora fija 00:00:00
+    const fechaFinal = new Date(`${fecha}T00:00:00`)
     const res = await fetch('/api/compras', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nroComprobante, // 🔹 ahora se incluye aquí
+        nroComprobante,
         proveedorId: proveedor.id,
         descuento,
+        fecha: fechaFinal,
         variantes: variantesCompra.map(v => ({
           id: v.id,
           cantidad: Number(v.cantidad),

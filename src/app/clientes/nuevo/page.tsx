@@ -24,10 +24,12 @@ export default function NuevoClientePage() {
       return
     }
 
+    const fechaFormateada = fechaNac ? new Date(fechaNac).toISOString().slice(0, 10) : ''
+
     const res = await fetch('/api/clientes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre, apellido, dni, telefono, email, fechaNac })
+      body: JSON.stringify({ nombre, apellido, dni, telefono, email, fechaNac: fechaFormateada })
     })
 
     if (res.ok) {

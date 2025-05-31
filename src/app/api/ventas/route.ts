@@ -51,12 +51,15 @@ export async function POST(req: Request) {
       0
     );
 
+    // Usar fecha directamente del frontend o la fecha actual si no viene
+    const fechaFinal = fecha ? new Date(fecha) : new Date();
+
     // 3. Registrar la venta en una transacción
     const venta = await prisma.$transaction(async (tx) => {
       const nuevaVenta = await tx.venta.create({
         data: {
           nroComprobante,
-          fecha: new Date(fecha), // ✅ Usa la fecha y hora actual
+          fecha: fechaFinal,
           cliente: !clienteId || clienteId === 1 ? undefined : { connect: { id: clienteId } },
           subtotal,
           descuento,
@@ -95,6 +98,7 @@ export async function POST(req: Request) {
             cantidad: -Math.abs(d.cantidad),
             comprobante: nroComprobante,
             observacion: "Venta",
+            fecha: nuevaVenta.fecha,
           },
         });
       }
@@ -125,11 +129,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ message: "Faltan fechas" }, { status: 400 });
   }
 
-  const fechaDesde = new Date(desde);
-  fechaDesde.setHours(0, 0, 0, 0);
-
-  const fechaHasta = new Date(hasta);
-  fechaHasta.setHours(23, 59, 59, 999);
+  const fechaDesde = new Date(`${desde}T00:00:00`);
+  const fechaHasta = new Date(`${hasta}T23:59:59`);
 
   try {
     const [ventas, total] = await Promise.all([

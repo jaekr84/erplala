@@ -20,6 +20,10 @@ export async function POST(req: Request) {
     }
     const totalConDescuento = total * (1 - (Number(descuento) || 0) / 100);
 
+    // Registrar fecha fija del día a las 00:00:00
+    const hoy = new Date();
+    const fecha = new Date(`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}T00:00:00`);
+
     // Ejecutar transacción
     const compra = await prisma.$transaction(async (tx) => {
       // 1. Obtener y actualizar contador de comprobantes
@@ -37,6 +41,7 @@ export async function POST(req: Request) {
           nroComprobante,
           proveedorId: Number(proveedorId),
           total: totalConDescuento,
+          fecha,
           detalles: {
             create: variantes.map((v: any) => ({
               varianteId: Number(v.id),
@@ -65,6 +70,7 @@ export async function POST(req: Request) {
             comprobante: nroComprobante,
             costo: Number(v.costo), // ✅ agregado para registrar en el Kardex
             observacion: "Compra",
+            fecha,
           },
         });
       }

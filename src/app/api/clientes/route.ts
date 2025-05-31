@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         dni: dni || null,
         telefono,
         email,
-        fechaNac: fechaNac ? new Date(fechaNac) : undefined,
+        fechaNac: fechaNac ? new Date(`${fechaNac}T00:00:00`) : undefined,
       },
     })
 

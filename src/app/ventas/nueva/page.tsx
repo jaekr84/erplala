@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { formatFecha } from '@/utils/format'
 
 const formatCurrency = (v: number) =>
     new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(v)
@@ -47,8 +48,7 @@ export default function NuevaVentaPage() {
     const [pagoCliente, setPagoCliente] = useState<number | ''>('')
     const [mediosPago, setMediosPago] = useState<MedioPago[]>([])
     const [modalCliente, setModalCliente] = useState(false)
-    const [cargando, setCargando] = useState(true)
-    const [cajaActiva, setCajaActiva] = useState(false)
+    // Eliminados: cargando, cajaActiva
     const [modalAbierto, setModalAbierto] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [ventaConfirmada, setVentaConfirmada] = useState<{ id: number; nroComprobante: number } | null>(null)
@@ -146,29 +146,10 @@ export default function NuevaVentaPage() {
       return () => document.removeEventListener('mousedown', manejarClickFuera)
     }, [])
 
-    useEffect(() => {
-      fetch('/api/caja/abierta')
-        .then(res => res.json())
-        .then(data => {
-          if (!data.abierta) {
-            router.push('/caja?volver=/ventas/nueva')
-            return
-          }
-          if (data.requiereCierre) {
-            router.push('/caja/cierre')
-            return
-          }
-          setCajaActiva(true)
-          setCargando(false)
-        })
-        .catch(() => {
-          setCajaActiva(false)
-          setCargando(false)
-        })
-    }, [])
+    // Eliminado useEffect de verificación de caja
 
     useEffect(() => {
-        setFecha(format(new Date(), 'yyyy-MM-dd'))
+        setFecha(formatFecha(new Date()))
         fetch('/api/contador/proximo?nombre=venta')
             .then(res => res.json())
             .then(data => setNroComprobante(data.valor))
@@ -246,9 +227,12 @@ export default function NuevaVentaPage() {
         const montoTotalPagado = Number(montoPago1) + Number(montoPago2)
         if (montoTotalPagado < total) return alert('El total abonado no cubre el total de la venta')
 
+        // Construir fecha como objeto Date con hora 00:00:00
+        const fechaFinal = new Date(`${fecha}T00:00:00`)
+
         const payload = {
             clienteId: clienteId === 1 ? null : clienteId,
-            fecha,
+            fecha: fechaFinal,
             detalle: detalle.map(item => ({
                 varianteId: item.varianteId,
                 cantidad: item.cantidad,
@@ -279,17 +263,7 @@ export default function NuevaVentaPage() {
         }
     }
 
-    if (cargando) return <p className="p-4">Cargando...</p>
 
-    if (!cajaActiva) {
-        return (
-            <div className="p-6 max-w-md mx-auto bg-white rounded shadow text-center space-y-4">
-                <h2 className="text-xl font-bold text-red-600">⚠️ Caja no abierta</h2>
-                <p>No se puede realizar una venta sin abrir caja.</p>
-                <Button onClick={() => router.push('/caja?volver=/ventas/nueva')}>Ir a abrir caja</Button>
-            </div>
-        )
-    }
 
     return (
 

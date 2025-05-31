@@ -79,6 +79,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const hoy = new Date();
+    const fecha = new Date(`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}T00:00:00`);
+
     const producto = await prisma.producto.create({
       data: {
         codigo: String(data.codigo),
@@ -88,6 +91,7 @@ export async function POST(req: NextRequest) {
         precioVenta: data.precioVenta,
         proveedorId,
         categoriaId,
+        createdAt: fecha,
         variantes: {
           create: data.variantes.map((v: any) => ({
             talle: v.talle,

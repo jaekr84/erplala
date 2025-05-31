@@ -47,8 +47,8 @@ export async function GET(_: NextRequest, context: any) {
   // FECHA + CLIENTE + COMPROBANTE
   const fecha = new Date(venta.fecha)
   lines.push(`FECHA:`)
-  lines.push(`${fecha.toLocaleDateString('es-AR')}`)
-  lines.push(`${fecha.toLocaleTimeString('es-AR')}`)
+  lines.push(`${fecha.getDate().toString().padStart(2, '0')}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getFullYear()}`)
+  lines.push(`${fecha.getHours().toString().padStart(2, '0')}:${fecha.getMinutes().toString().padStart(2, '0')}`)
   lines.push(`CLIENTE:`)
   lines.push(venta.cliente?.nombre || 'Consumidor Final')
   lines.push(`COMPROBANTE:`)

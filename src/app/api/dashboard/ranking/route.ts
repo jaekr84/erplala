@@ -4,10 +4,8 @@ import prisma from '@/lib/prisma'
 export async function POST(req: Request) {
   const { fechaDesde, fechaHasta } = await req.json()
 
-  const desde = new Date(fechaDesde)
-  const hasta = new Date(fechaHasta)
-  // Incluir todo el día en el filtro hasta
-  hasta.setHours(23, 59, 59, 999)
+  const desde = new Date(`${fechaDesde}T00:00:00`)
+  const hasta = new Date(`${fechaHasta}T23:59:59`)
   const dias = Math.ceil((hasta.getTime() - desde.getTime()) / (1000 * 60 * 60 * 24)) + 1
 
   const periodoAnteriorDesde = new Date(desde)

@@ -97,12 +97,12 @@ export default function RotacionPage() {
             >
               <td className="p-2 text-blue-600">{a.codigo}</td>
               <td className="p-2">{a.descripcion}</td>
-              <td className="p-2 text-center">{format(new Date(a.fechaAlta), 'dd/MM/yyyy')}</td>
+              <td className="p-2 text-center">{`${new Date(a.fechaAlta).getDate().toString().padStart(2, '0')}-${(new Date(a.fechaAlta).getMonth() + 1).toString().padStart(2, '0')}-${new Date(a.fechaAlta).getFullYear()}`}</td>
               <td className="p-2 text-center">{a.ventasTotales}</td>
               <td className="p-2 text-center">{a.rotacionSemanal.toFixed(2)}</td>
               <td className="p-2 text-center">{a.stockTotal}</td>
               <td className="p-2 text-center">
-                {a.ultimaVenta ? format(new Date(a.ultimaVenta), 'dd/MM/yyyy') : '-'}
+                {a.ultimaVenta ? `${new Date(a.ultimaVenta).getDate().toString().padStart(2, '0')}-${(new Date(a.ultimaVenta).getMonth() + 1).toString().padStart(2, '0')}-${new Date(a.ultimaVenta).getFullYear()}` : '-'}
               </td>
               <td className="p-2 text-center">
                 {a.etiqueta === 'altisima' ? '🔥'
@@ -170,7 +170,7 @@ export default function RotacionPage() {
                     <td className="p-1 text-center">{v.ventas}</td>
                     <td className="p-1 text-center">{v.rotacionSemanal.toFixed(2)}</td>
                     <td className="p-1 text-center">
-                      {v.ultimaVenta ? format(new Date(v.ultimaVenta), 'dd/MM/yyyy') : '-'}
+                      {v.ultimaVenta ? `${new Date(v.ultimaVenta).getDate().toString().padStart(2, '0')}-${(new Date(v.ultimaVenta).getMonth() + 1).toString().padStart(2, '0')}-${new Date(v.ultimaVenta).getFullYear()}` : '-'}
                     </td>
                   </tr>
                 ))}

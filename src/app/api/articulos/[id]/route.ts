@@ -40,6 +40,9 @@ export async function PUT(req: NextRequest, context: any) {
   const { descripcion, proveedorId, categoriaId, costo, margen, precioVenta, variantes } = data
 
   try {
+    // Registrar la fecha fija del día en updatedAt (sin hora)
+    const hoy = new Date();
+    const fecha = new Date(`${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}T00:00:00`);
     // Actualiza el producto principal
     await prisma.producto.update({
       where: { id },
@@ -50,7 +53,7 @@ export async function PUT(req: NextRequest, context: any) {
         costo,
         margen,
         precioVenta,
-        updatedAt: new Date(),
+        updatedAt: fecha,
       },
     })
 

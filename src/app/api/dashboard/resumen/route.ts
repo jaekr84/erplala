@@ -11,7 +11,8 @@ import {
 
 export async function GET() {
   try {
-    const hoy = new Date()
+    const hoyDate = new Date()
+    const hoy = new Date(`${hoyDate.getFullYear()}-${String(hoyDate.getMonth() + 1).padStart(2, '0')}-${String(hoyDate.getDate()).padStart(2, '0')}T00:00:00`)
 
     const [ventasHoy, ventasSemana, ventasMes] = await Promise.all([
       prisma.venta.findMany({

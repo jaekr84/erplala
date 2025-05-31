@@ -41,7 +41,7 @@ export async function PUT(req: NextRequest, context: any) {
         dni,
         telefono,
         email,
-        fechaNac: fechaNac ? new Date(fechaNac) : undefined,
+        fechaNac: fechaNac ? new Date(`${fechaNac}T00:00:00`) : undefined,
       },
     })
 
